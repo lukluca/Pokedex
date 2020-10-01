@@ -9,10 +9,10 @@ import XCTest
 @testable import Pokedex
 
 class MainWindowFactoryTests: XCTestCase {
-    
-    private let sut = MainWindowFactory()
 
     func testPresentsMainWindow() throws {
+        let sut = MainWindowFactory()
+
         let window = sut.presentWithCollectionEmbeddedInNavigation()
         let navigation = window.rootViewController as? UINavigationController
         let navigationViewControllersCount = navigation?.viewControllers.count ?? 0
@@ -23,6 +23,6 @@ class MainWindowFactoryTests: XCTestCase {
         XCTAssertNotNil(navigation, "The root view controller must be a UINavigationController")
         XCTAssertEqual(navigationViewControllersCount, 1, "The navigation must have one controller")
         XCTAssertNotNil(collection, "The navigation root view controller must be a PokemonCollectionViewController")
-        XCTAssertNotNil(collection?.collectionViewLayout as? UICollectionViewFlowLayout, "The collectionViewLayout must be a UICollectionViewFlowLayout")
+        XCTAssertNotNil(collection?.collectionViewLayout as? PokemonCollectionViewFlowLayout, "The collectionViewLayout must be a PokemonCollectionViewFlowLayout")
     }
 }
