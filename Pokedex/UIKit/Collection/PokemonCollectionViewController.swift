@@ -15,9 +15,15 @@ class PokemonCollectionViewController: UICollectionViewController {
         super.viewDidLoad()
         
         title = "Pokedex"
+        
+        if #available(iOS 13.0, *) {
+            collectionView.backgroundColor = .systemBackground
+        } else {
+            collectionView.backgroundColor = .white
+        }
 
-        collectionView?.contentInsetAdjustmentBehavior = .always
-        collectionView?.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        collectionView.contentInsetAdjustmentBehavior = .always
+        collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

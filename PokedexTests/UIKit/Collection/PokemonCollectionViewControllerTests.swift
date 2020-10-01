@@ -23,4 +23,21 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         
         XCTAssertEqual(sut.title, "Pokedex", "The title must be equal to 'Pokedex'")
     }
+    
+    private lazy var iOS13 = OperatingSystemVersion(majorVersion: 13, minorVersion: 0, patchVersion: 0)
+    
+    @available(iOS 13.0, *)
+    func testBackgroundColorForDarkAwareSystems() throws {
+        //ifVersionAtLeast 13
+        try XCTSkipUnless(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
+        
+        XCTAssertEqual(sut.collectionView.backgroundColor, .systemBackground)
+    }
+    
+    func testBackgroundColorIsWhite() throws {
+        //ifVersionBelow 13
+        try XCTSkipIf(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
+        
+        XCTAssertEqual(sut.collectionView.backgroundColor, .white)
+    }
 }
