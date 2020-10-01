@@ -9,16 +9,17 @@ import UIKit
 
 struct MainWindowFactory {
     
-    func presentWithCollectionAsRoot() -> UIWindow {
+    func presentWithCollectionEmbeddedInNavigation() -> UIWindow {
         let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = PokemonCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = PokemonCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout())
+        window.rootViewController = UINavigationController(rootViewController: collection)
         window.makeKeyAndVisible()
         return window
     }
     
     @available(iOS 13.0, *)
-    func presentWithCollectionAsRoot(using scene: UIWindowScene) -> UIWindow {
-        let window = presentWithCollectionAsRoot()
+    func presentWithCollectionEmbeddedInNavigation(using scene: UIWindowScene) -> UIWindow {
+        let window = presentWithCollectionEmbeddedInNavigation()
         window.windowScene = scene
         return window
     }
