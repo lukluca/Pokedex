@@ -9,6 +9,8 @@ import UIKit
 
 class PokemonCollectionViewCell: UICollectionViewCell {
     
+    private let padding: CGFloat = 15
+    
     var name: String? {
         didSet {
             nameLabel.text = name
@@ -24,6 +26,7 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     //Subviews
     private lazy var imageView: UIImageView = {
         let view = UIImageView()
+        view.backgroundColor = .systemPink
         view.accessibilityIdentifier = "imageView"
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -32,19 +35,21 @@ class PokemonCollectionViewCell: UICollectionViewCell {
         let view = UILabel()
         view.accessibilityIdentifier = "nameLabel"
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.textAlignment = .center
         return view
     }()
     
     //Constraints
     private lazy var imageViewConstraints: [NSLayoutConstraint] = {
-        [imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-        imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+        [imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+        imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
         imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)]
     }()
     private lazy var nameLabelConstraints: [NSLayoutConstraint] = {
-        [nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
-        nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
-        nameLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)]
+        return [nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+         nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding),
+         nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+         nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding)]
     }()
     private var activatedConstraints = [NSLayoutConstraint]()
     
@@ -63,6 +68,8 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     private func addCustomSubviews() {
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
+        
+        setNeedsUpdateConstraints()
     }
     
     override func updateConstraints() {
