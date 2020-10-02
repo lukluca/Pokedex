@@ -9,7 +9,18 @@ import UIKit
 
 class PokemonCollectionViewController: UICollectionViewController {
 
+    private let viewModel: CollectionViewModel
+
     private let cellReuseIdentifier = "PokemonCell"
+
+    init(collectionViewLayout layout: UICollectionViewLayout, viewModel: CollectionViewModel) {
+        self.viewModel = viewModel
+        super.init(collectionViewLayout: layout)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) unavailable. Use init with layout and view model instead")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,13 +38,22 @@ class PokemonCollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        59
+        viewModel.numberOfItems(in: section)
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath)
-        cell.backgroundColor = .orange
-        return cell
+
+        guard let pokemonCell = cell as? PokemonCollectionViewCell else {
+            return cell
+        }
+
+        let item = viewModel.item(at: indexPath)
+
+        pokemonCell.name = item.text
+        pokemonCell.image = item.image
+
+        return pokemonCell
     }
 }
 
