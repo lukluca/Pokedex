@@ -140,7 +140,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
     //MARK: Helpers
 
-    private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel()) -> PokemonCollectionViewController {
+    private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel(catcher: DummyPokemonCatcher())) -> PokemonCollectionViewController {
         PokemonCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout(), viewModel: viewModel)
     }
 
@@ -157,6 +157,7 @@ private class OneItemCollectionViewModel: CollectionViewModel {
     init(text: String, image: UIImage) {
         self.text = text
         self.image = image
+        super.init(catcher: DummyPokemonCatcher())
     }
 
     override func numberOfItems(in section: Int) -> Int {
@@ -173,6 +174,10 @@ private class CollectionViewModelSpy: CollectionViewModel {
     private(set) var getPokemonsInvocations = [(Result<(), Error>) -> ()]()
     private(set) var getMorePokemonsIfNeededInvocations = [[IndexPath]]()
     private(set) var cancelMorePokemonsIfNeededInvocations = [[IndexPath]]()
+
+    init() {
+        super.init(catcher: DummyPokemonCatcher())
+    }
 
     override func getPokemons(completion: @escaping (Result<(), Error>) -> ()) {
         getPokemonsInvocations.append(completion)
@@ -194,13 +199,14 @@ private class CollectionViewModelStub: CollectionViewModelSpy {
     }
 }
 
-private class OneItemCollectionViewModelSpy: CollectionViewModelSpy {
-
-    override func numberOfItems(in section: Int) -> Int {
-        1
+private class DummyPokemonCatcher: PokemonCatcher {
+    func first() {
     }
 
-    override func item(at indexPath: Foundation.IndexPath) -> CellViewModel {
-        CellViewModel(text: "", image: UIImage())
+    func next() {
+    }
+
+    func taskOngoingFor(for index: Int) -> Bool {
+        false
     }
 }

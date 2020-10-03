@@ -11,7 +11,8 @@ struct MainWindowFactory {
     
     func presentWithCollectionEmbeddedInNavigation() -> UIWindow {
         let window = UIWindow(frame: UIScreen.main.bounds)
-        let collection = PokemonCollectionViewController(collectionViewLayout: PokemonCollectionViewFlowLayout(), viewModel: CollectionViewModel())
+        let viewModel = CollectionViewModel(catcher: DBPokemonCatcher())
+        let collection = PokemonCollectionViewController(collectionViewLayout: PokemonCollectionViewFlowLayout(), viewModel: viewModel)
         window.rootViewController = UINavigationController(rootViewController: collection)
         window.makeKeyAndVisible()
         return window
