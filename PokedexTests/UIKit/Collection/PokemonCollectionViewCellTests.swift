@@ -74,6 +74,17 @@ class PokemonCollectionViewCellTests: XCTestCase {
         XCTAssertNil(sut.imageView?.backgroundColor)
         XCTAssertNil(animation, "Pulse animation not stopped")
     }
+
+    func testStartsAnimateIfNilImageIsSet() {
+        sut.image = UIImage()
+
+        sut.image = nil
+
+        let animation = sut.imageView?.layer.animation(forKey: "pulse")
+        XCTAssertNotNil(animation)
+        XCTAssertNotNil(sut.imageView?.backgroundColor)
+        XCTAssertNil(sut.imageView?.image)
+    }
 }
 
 private extension PokemonCollectionViewCell {

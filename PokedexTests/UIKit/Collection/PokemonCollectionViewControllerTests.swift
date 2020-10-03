@@ -71,6 +71,16 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         XCTAssertTrue(sameImageInstance, "Missing binding with cell")
     }
 
+    func testDoesNotBindCellFromCellViewModelWhenThereIsNoCellViewModelAvailable() {
+        let sut = makeSUT(viewModel: FilledCollectionViewModelWithEmptyCells())
+
+        let cell = sut.collectionView(sut.collectionView, cellForItemAt: firstIndexPath) as? PokemonCollectionViewCell
+
+        XCTAssertNotNil(cell, "The cell must be a PokemonCollectionViewCell")
+        XCTAssertNil(cell?.name, "Missing binding with cell")
+        XCTAssertNil(cell?.image, "Missing binding with cell")
+    }
+
     func testOnViewDidLoadGetsPokemon() {
         let spy = CollectionViewModelSpy()
         let sut = makeSUT(viewModel: spy)
@@ -149,6 +159,21 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
     private lazy var indexPaths = [IndexPath(item: 5, section: 0), IndexPath(item: 10, section: 0), IndexPath(item: 20, section: 0)]
 }
 
+private class FilledCollectionViewModelWithEmptyCells: CollectionViewModel {
+
+    init() {
+        super.init(catcher: DummyPokemonCatcher())
+    }
+
+    override func numberOfItems(in section: Int) -> Int {
+        10
+    }
+
+    override func item(at indexPath: IndexPath) -> CellViewModel? {
+        nil
+    }
+}
+
 private class OneItemCollectionViewModel: CollectionViewModel {
 
     private let text: String
@@ -164,7 +189,7 @@ private class OneItemCollectionViewModel: CollectionViewModel {
         1
     }
 
-    override func item(at indexPath: Foundation.IndexPath) -> CellViewModel {
+    override func item(at indexPath: IndexPath) -> CellViewModel? {
         CellViewModel(text: text, image: image)
     }
 }
@@ -193,7 +218,6 @@ private class CollectionViewModelSpy: CollectionViewModel {
 }
 
 private class CollectionViewModelStub: CollectionViewModelSpy {
-
     func simulateGetPokemonsFailure() {
         getPokemonsInvocations.first?(Result.failure(NSError.dummyError))
     }

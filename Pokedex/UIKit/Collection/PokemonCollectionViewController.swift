@@ -104,10 +104,13 @@ class PokemonCollectionViewController: UICollectionViewController {
             return cell
         }
 
-        let item = viewModel.item(at: indexPath)
-
-        pokemonCell.name = item.text
-        pokemonCell.image = item.image
+        if let item = viewModel.item(at: indexPath) {
+            pokemonCell.name = item.text
+            pokemonCell.image = item.image
+        } else {
+            pokemonCell.name = nil
+            pokemonCell.image = nil
+        }
 
         return pokemonCell
     }

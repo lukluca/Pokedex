@@ -11,6 +11,8 @@ class CollectionViewModel {
 
     private var cellViewModels = [CellViewModel]()
 
+    private var numberOfItems = 0
+
     private let catcher: PokemonCatcher
 
     init(catcher: PokemonCatcher) {
@@ -18,11 +20,14 @@ class CollectionViewModel {
     }
 
     func numberOfItems(in section: Int) -> Int {
-        cellViewModels.count
+        numberOfItems
     }
 
-    func item(at indexPath: IndexPath) -> CellViewModel {
-        cellViewModels[indexPath.row]
+    func item(at indexPath: IndexPath) -> CellViewModel? {
+        guard indexPath.row < cellViewModels.count else {
+            return nil
+        }
+        return cellViewModels[indexPath.row]
     }
 
     func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -32,6 +37,7 @@ class CollectionViewModel {
             }
             switch result {
             case .success(let list):
+                self.numberOfItems = list.totalPokemonCount
                 self.append(list.pokemons.compactMap {self.convert($0)})
                 completion(.success(()))
             case .failure(let error):

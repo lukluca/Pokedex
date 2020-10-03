@@ -20,6 +20,8 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     var image: UIImage? {
         didSet {
             guard let image = image else {
+                imageView.image = nil
+                startAnimateIfNeeded()
                 return
             }
             stopAnimate()
