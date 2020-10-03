@@ -108,6 +108,8 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         XCTAssertNotNil(presentedAlert)
 
         let lastTitle = "Retry"
+        XCTAssertEqual(presentedAlert?.title, "Failure")
+        XCTAssertEqual(presentedAlert?.message, "There was an error getting the Pokemons!")
         XCTAssertEqual(presentedAlert?.actions.count, 2)
         XCTAssertEqual(presentedAlert?.actions.first?.title, "Ok")
         XCTAssertEqual(presentedAlert?.actions.last?.title, lastTitle)
