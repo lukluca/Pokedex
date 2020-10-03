@@ -7,6 +7,12 @@ target 'Pokedex' do
   pod 'PokemonAPI'
 end
 
+target 'PokedexTests' do
+  use_frameworks!
+
+  pod 'RealmSwift'
+end
+
 post_install do |installer|
      installer.pods_project.targets.each do |target|
          target.build_configurations.each do |config|

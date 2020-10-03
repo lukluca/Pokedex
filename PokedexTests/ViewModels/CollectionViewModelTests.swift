@@ -75,21 +75,6 @@ class CollectionViewModelTests: XCTestCase {
     }
 }
 
-private class PokemonCatcherSpy: PokemonCatcher {
-
-    private(set) var firstInvocations = [(Result<[Pokemon], Error>) -> Void]()
-
-    func first(completion: @escaping (Result<[Pokemon], Error>) -> Void) {
-        firstInvocations.append(completion)
-    }
-
-    func next() {}
-
-    func taskOngoingFor(for index: Int) -> Bool {
-        false
-    }
-}
-
 private class PokemonCatcherMock: PokemonCatcherSpy {
 
     let pokemons: [Pokemon]
