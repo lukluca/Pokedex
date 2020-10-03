@@ -32,7 +32,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         self.pageSize = pageSize
     }
 
-    func first(completion: @escaping (Result<PokemonList, Error>) -> Void) {
+    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {
         firstPageFromAPI { result in
             switch result {
             case .success(let remoteList):
@@ -57,6 +57,12 @@ class RemotePokemonCatcher: PokemonCatcher {
                         pokemons.append(pkm)
 
                         if fulfillmentCount == remoteList.pokemons.count, let count = remoteList.totalPokemonCount {
+                            guard !pokemons.isEmpty else {
+                                DispatchQueue.main.async {
+                                    completion(Result.failure(RemoteError.firstPokemons))
+                                }
+                                return
+                            }
                             let list = PokemonList(totalPokemonCount: count, pokemons: pokemons)
                             DispatchQueue.main.async {
                                 completion(Result.success(list))

@@ -22,7 +22,7 @@ class CollectionViewModelTests: XCTestCase {
 
         sut.getPokemons { result in }
 
-        XCTAssertEqual(spy.firstInvocations.count, 1)
+        XCTAssertEqual(spy.firstPageInvocations.count, 1)
     }
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
@@ -95,13 +95,13 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
         guard let list = pokemonList else {
             return
         }
-        firstInvocations.first?(Result.success(list))
+        firstPageInvocations.first?(Result.success(list))
     }
 
     func simulateFirstOnError() {
         guard let error = error else {
             return
         }
-        firstInvocations.first?(Result.failure(error))
+        firstPageInvocations.first?(Result.failure(error))
     }
 }

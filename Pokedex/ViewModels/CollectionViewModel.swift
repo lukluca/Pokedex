@@ -26,7 +26,7 @@ class CollectionViewModel {
     }
 
     func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
-        catcher.first { [weak self] result in
+        catcher.firstPage { [weak self] result in
             guard let self = self else {
                 return
             }

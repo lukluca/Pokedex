@@ -22,9 +22,9 @@ class DBPokemonCatcherTests: XCTestCase {
         let spy = PokemonCatcherSpy()
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: spy)
 
-        sut.first { result in }
+        sut.firstPage { result in }
 
-        XCTAssertEqual(spy.firstInvocations.count, 1)
+        XCTAssertEqual(spy.firstPageInvocations.count, 1)
     }
 
     func testIfIsNotEmptyDoesNotCallNextHandler() throws {
@@ -33,9 +33,9 @@ class DBPokemonCatcherTests: XCTestCase {
         let spy = PokemonCatcherSpy()
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: spy)
 
-        sut.first { result in }
+        sut.firstPage { result in }
 
-        XCTAssertEqual(spy.firstInvocations.count, 0)
+        XCTAssertEqual(spy.firstPageInvocations.count, 0)
     }
 
     func testRetrievesExpectedPokemonStored() throws {
@@ -44,7 +44,7 @@ class DBPokemonCatcherTests: XCTestCase {
 
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
 
-        sut.first { result in
+        sut.firstPage { result in
             switch result {
             case .success(let list):
                 XCTAssertEqual(list.totalPokemonCount, 1)
@@ -66,7 +66,7 @@ class DBPokemonCatcherTests: XCTestCase {
 
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
 
-        sut.first { result in
+        sut.firstPage { result in
             switch result {
             case .success(let list):
                 XCTAssertEqual(list.totalPokemonCount, 100)

@@ -8,7 +8,7 @@
 @testable import Pokedex
 
 class DummyPokemonCatcher: PokemonCatcher {
-    func first(completion: @escaping (Result<PokemonList, Error>) -> Void) {}
+    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {}
 
     func next() {}
 

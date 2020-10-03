@@ -41,11 +41,11 @@ class DBPokemonCatcher: PokemonCatcher {
         self.nextHandler = nextHandler
     }
 
-    func first(completion: @escaping (Result<PokemonList, Error>) -> Void) {
+    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {
         let results = database?.objects(DBPokemonList.self)
 
         guard let entityList = results?.first, !entityList.pokemons.isEmpty else {
-            nextHandler.first(completion: completion)
+            nextHandler.firstPage(completion: completion)
             return
         }
 
