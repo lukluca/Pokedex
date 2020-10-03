@@ -28,7 +28,7 @@ class CollectionViewModelTests: XCTestCase {
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
         let pokemon = Pokemon(id: 0, name: "foo", image: UIImage())
-        let mock = PokemonCatcherMock(pokemons: [pokemon])
+        let mock = PokemonCatcherMock(pokemonList: PokemonList(totalPokemonCount: 1, pokemons: [pokemon]))
         let sut = makeSUT(catcher: mock)
 
         sut.getPokemons { result in
@@ -77,21 +77,24 @@ class CollectionViewModelTests: XCTestCase {
 
 private class PokemonCatcherMock: PokemonCatcherSpy {
 
-    let pokemons: [Pokemon]
+    let pokemonList: PokemonList?
     let error: Error?
 
-    init(pokemons: [Pokemon]){
-       self.pokemons = pokemons
+    init(pokemonList: PokemonList){
+        self.pokemonList = pokemonList
         self.error = nil
     }
 
     init(error: Error) {
-        self.pokemons = []
+        self.pokemonList = nil
         self.error = error
     }
 
     func simulateFirstOnSuccess() {
-        firstInvocations.first?(Result.success(pokemons))
+        guard let list = pokemonList else {
+            return
+        }
+        firstInvocations.first?(Result.success(list))
     }
 
     func simulateFirstOnError() {

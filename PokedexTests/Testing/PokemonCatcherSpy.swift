@@ -9,9 +9,9 @@
 
 class PokemonCatcherSpy: PokemonCatcher {
 
-    private(set) var firstInvocations = [(Result<[Pokemon], Error>) -> Void]()
+    private(set) var firstInvocations = [(Result<PokemonList, Error>) -> Void]()
 
-    func first(completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+    func first(completion: @escaping (Result<PokemonList, Error>) -> Void) {
         firstInvocations.append(completion)
     }
 

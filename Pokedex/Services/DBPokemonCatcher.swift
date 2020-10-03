@@ -16,6 +16,15 @@ class DBPokemon: Object {
     @objc dynamic var id = 0
     @objc dynamic var name = ""
     @objc dynamic var imageData = Data()
+
+    override static func primaryKey() -> String? {
+        "id"
+    }
+}
+
+class DBPokemonList: Object {
+    @objc dynamic var totalPokemonCount = 0
+    dynamic var pokemons = List<DBPokemon>()
 }
 
 class DBPokemonCatcher: PokemonCatcher {
@@ -32,16 +41,22 @@ class DBPokemonCatcher: PokemonCatcher {
         self.nextHandler = nextHandler
     }
 
-    func first(completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+    func first(completion: @escaping (Result<PokemonList, Error>) -> Void) {
+        let results = database?.objects(DBPokemonList.self)
 
-        let results = database?.objects(DBPokemon.self).filter("id >= 0 AND id < \(pageSize)")
-
-        guard let entities = results, entities.count > 0 else {
+        guard let entityList = results?.first, !entityList.pokemons.isEmpty else {
             nextHandler.first(completion: completion)
             return
         }
 
-        let pokemons = entities.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
+        let searchedPokemons = entityList.pokemons.filter { [weak self] (pokemon: DBPokemon) -> Bool in
+            guard let self = self else {
+                return false
+            }
+            return pokemon.id >= 0 && pokemon.id < self.pageSize
+        }
+
+        let pokemons = searchedPokemons.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
             self?.convert(entity)
         }
 
@@ -50,7 +65,8 @@ class DBPokemonCatcher: PokemonCatcher {
             return
         }
 
-        completion(Result.success(Array(pokemons)))
+        let list = PokemonList(totalPokemonCount: entityList.totalPokemonCount, pokemons: Array(pokemons))
+        completion(Result.success(list))
     }
 
     private func convert(_ entity: DBPokemon) -> Pokemon? {

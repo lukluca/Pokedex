@@ -12,7 +12,7 @@ struct MainWindowFactory {
     func presentWithCollectionEmbeddedInNavigation() -> UIWindow {
         let window = UIWindow(frame: UIScreen.main.bounds)
         let pageSize = 50
-        let remote = RemotePokemonCatcher()
+        let remote = RemotePokemonCatcher(pageSize: pageSize)
         let database = DBPokemonCatcher(pageSize: pageSize, nextHandler: remote)
         let viewModel = CollectionViewModel(catcher: database)
         let collection = PokemonCollectionViewController(collectionViewLayout: PokemonCollectionViewFlowLayout(), viewModel: viewModel)

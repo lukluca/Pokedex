@@ -28,7 +28,7 @@ class DBPokemonCatcherTests: XCTestCase {
     }
 
     func testIfIsNotEmptyDoesNotCallNextHandler() throws {
-        try writeInsideDatabase(entities: makeEntities(count:1))
+        try writeInsideDatabase(list: makeList(ofSize: 1))
 
         let spy = PokemonCatcherSpy()
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: spy)
@@ -40,13 +40,15 @@ class DBPokemonCatcherTests: XCTestCase {
 
     func testRetrievesExpectedPokemonStored() throws {
         let expect = expectation(description: "Completion invocation")
-        try writeInsideDatabase(entities: makeEntities(count:1))
+        try writeInsideDatabase(list: makeList(ofSize: 1))
 
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
 
         sut.first { result in
             switch result {
-            case .success(let pokemons):
+            case .success(let list):
+                XCTAssertEqual(list.totalPokemonCount, 1)
+                let pokemons = list.pokemons
                 XCTAssertEqual(pokemons.count, 1)
                 XCTAssertEqual(pokemons.first?.id, 0)
                 XCTAssertEqual(pokemons.first?.name, "foo_0")
@@ -60,13 +62,15 @@ class DBPokemonCatcherTests: XCTestCase {
 
     func testRetrievesOnlyThePokemonPresentedInsideTheFirstPage() throws {
         let expect = expectation(description: "Completion invocation")
-        try writeInsideDatabase(entities: makeEntities(count:100))
+        try writeInsideDatabase(list: makeList(ofSize: 100))
 
         let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
 
         sut.first { result in
             switch result {
-            case .success(let pokemons):
+            case .success(let list):
+                XCTAssertEqual(list.totalPokemonCount, 100)
+                let pokemons = list.pokemons
                 XCTAssertEqual(pokemons.count, 10)
                 let sorted = pokemons.sorted { (pokemon: Pokemon, pokemon2: Pokemon) -> Bool in
                     pokemon.id < pokemon2.id
@@ -83,15 +87,23 @@ class DBPokemonCatcherTests: XCTestCase {
         wait(for: [expect], timeout: 0)
     }
 
-    private func writeInsideDatabase(entities: [DBPokemon]) throws {
+    private func writeInsideDatabase(list: DBPokemonList) throws {
         let database = try Realm()
         try database.write {
-            database.add(entities)
+            database.add(list)
         }
     }
 
-    private func makeEntities(count: Int) -> [DBPokemon] {
-        (0 ..< count).compactMap { id -> DBPokemon? in
+    private func makeList(ofSize size: Int) -> DBPokemonList {
+        let pokemons = makeEntities(count:size)
+        let list = DBPokemonList()
+        list.totalPokemonCount = size
+        list.pokemons = pokemons
+        return list
+    }
+
+    private func makeEntities(count: Int) -> List<DBPokemon> {
+        let array = (0 ..< count).compactMap { id -> DBPokemon? in
             guard let path = Bundle(for: DBPokemon.self).path(forResource: nil, ofType: "png") else {
                 return nil
             }
@@ -104,5 +116,9 @@ class DBPokemonCatcherTests: XCTestCase {
             entity.imageData = image.pngData() ?? Data()
             return entity
         }
+
+        let list = List<DBPokemon>()
+        list.append(objectsIn: array)
+        return list
     }
 }

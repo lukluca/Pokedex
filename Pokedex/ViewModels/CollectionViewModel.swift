@@ -31,8 +31,8 @@ class CollectionViewModel {
                 return
             }
             switch result {
-            case .success(let pokemons): ()
-                self.append(pokemons.map {self.convert($0)})
+            case .success(let list): ()
+                self.append(list.pokemons.map {self.convert($0)})
                 completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
