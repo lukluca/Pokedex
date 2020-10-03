@@ -19,6 +19,10 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     
     var image: UIImage? {
         didSet {
+            guard let image = image else {
+                return
+            }
+            stopAnimate()
             imageView.image = image
         }
     }
@@ -26,7 +30,6 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     //Subviews
     private lazy var imageView: UIImageView = {
         let view = UIImageView()
-        view.backgroundColor = .systemPink
         view.accessibilityIdentifier = "imageView"
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -46,7 +49,7 @@ class PokemonCollectionViewCell: UICollectionViewCell {
         imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)]
     }()
     private lazy var nameLabelConstraints: [NSLayoutConstraint] = {
-        return [nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+        [nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
          nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding),
          nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
          nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding)]
@@ -63,6 +66,27 @@ class PokemonCollectionViewCell: UICollectionViewCell {
         super.init(coder: coder)
         
         addCustomSubviews()
+    }
+
+    func startAnimateIfNeeded() {
+        guard imageView.image == nil else {
+            return
+        }
+
+        imageView.backgroundColor = .systemPink
+        let pulseAnimation = CABasicAnimation(keyPath: "opacity")
+        pulseAnimation.duration = 3
+        pulseAnimation.fromValue = 0.3
+        pulseAnimation.toValue = 0.7
+        pulseAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        pulseAnimation.autoreverses = true
+        pulseAnimation.repeatCount = .greatestFiniteMagnitude
+        imageView.layer.add(pulseAnimation, forKey: "pulse")
+    }
+
+    func stopAnimate() {
+        imageView.layer.removeAllAnimations()
+        imageView.backgroundColor = nil
     }
     
     private func addCustomSubviews() {
