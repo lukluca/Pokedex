@@ -1,4 +1,9 @@
-// See LICENSE.txt for licensing information
+//
+//  PokemonCollectionViewControllerTests.swift
+//  PokedexTests
+//
+//  Created by Luca Tagliabue on 3/10/2020.
+//
 
 import UIKit
 
