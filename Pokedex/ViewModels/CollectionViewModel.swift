@@ -13,4 +13,7 @@ class CollectionViewModel {
     func item(at indexPath: IndexPath) -> CellViewModel {
         cellViewModels[indexPath.row]
     }
+
+    func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
+    }
 }

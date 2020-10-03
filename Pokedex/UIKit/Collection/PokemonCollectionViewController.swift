@@ -9,6 +9,9 @@ import UIKit
 
 class PokemonCollectionViewController: UICollectionViewController {
 
+    private var viewAppeared = false
+    private var errorAlert: UIAlertController?
+
     private let viewModel: CollectionViewModel
 
     private let cellReuseIdentifier = "PokemonCell"
@@ -35,6 +38,57 @@ class PokemonCollectionViewController: UICollectionViewController {
 
         collectionView.contentInsetAdjustmentBehavior = .always
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+
+        getPokemons()
+    }
+
+    private func getPokemons() {
+        viewModel.getPokemons { [weak self] result in
+            guard let self = self else {
+                return
+            }
+            switch result {
+            case .success:
+                self.collectionView.reloadData()
+            case .failure:
+                if self.viewAppeared {
+                    self.showErrorAlert()
+                } else {
+                    self.errorAlert = self.makeErrorAlert()
+                }
+            }
+        }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        viewAppeared = true
+
+        if let alert = errorAlert {
+            present(alert, animated: true)
+            errorAlert = nil
+        }
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        viewAppeared = false
+    }
+
+    private func showErrorAlert() {
+        present(makeErrorAlert(), animated: true)
+    }
+
+    private func makeErrorAlert() -> UIAlertController {
+        let alert = UIAlertController(title: "Failure", message: "There was an error getting the Pokemons!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { [weak self] action in
+            self?.getPokemons()
+        }))
+
+        return alert
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

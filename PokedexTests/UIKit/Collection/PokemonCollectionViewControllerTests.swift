@@ -16,6 +16,12 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         XCTAssertNotNil(cell, "The PokemonCell must be registered")
     }
+
+    func testConfiguresCollectionWhitAlwaysContentInsetAdjustmentBehavior() {
+        let sut = makeSUT()
+
+        XCTAssertEqual(sut.collectionView.contentInsetAdjustmentBehavior, .always)
+    }
     
     func testHasPokedexTitle() {
         let sut = makeSUT()
@@ -34,7 +40,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         let sut = makeSUT()
         
-        XCTAssertEqual(sut.collectionView.backgroundColor, .systemBackground)
+        XCTAssertEqual(sut.collectionView.backgroundColor, .systemBackground, "We want a systemBackground")
     }
     
     func testBackgroundColorIsWhite() throws {
@@ -43,7 +49,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         let sut = makeSUT()
         
-        XCTAssertEqual(sut.collectionView.backgroundColor, .white)
+        XCTAssertEqual(sut.collectionView.backgroundColor, .white, "We want a white background")
     }
 
     func testBindingCellFromCellViewModel() {
@@ -59,8 +65,53 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         let sameImageInstance = cell?.image === image
 
-        XCTAssertEqual(cell?.name, text)
-        XCTAssertTrue(sameImageInstance)
+        XCTAssertEqual(cell?.name, text, "Missing binding with cell")
+        XCTAssertTrue(sameImageInstance, "Missing binding with cell")
+    }
+
+    func testOnViewDidLoadGetsPokemon() {
+        let spy = CollectionViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.loadViewIfNeeded()
+
+        XCTAssertEqual(spy.getPokemonsInvocations.count, 1, "On view did load must get Pokemon")
+    }
+
+    func testIfThereAreProblemsGettingPokemonsDisplaysAnAlertOnlyIfViewIsAppeared() {
+        let stub = CollectionViewModelStub()
+        let sut = makeSUT(viewModel: stub)
+
+        let window = UIWindow()
+        window.rootViewController = sut
+        window.makeKeyAndVisible()
+
+        addTeardownBlock {
+            window.resignKey()
+            window.isHidden = true
+        }
+
+        sut.loadViewIfNeeded()
+
+        stub.simulateGetPokemonsFailure()
+
+        let alert = sut.presentedViewController as? UIAlertController
+
+        XCTAssertNil(alert)
+
+        sut.viewDidAppear(true)
+
+        let presentedAlert = sut.presentedViewController as? UIAlertController
+
+        XCTAssertNotNil(presentedAlert)
+
+        let lastTitle = "Retry"
+        XCTAssertEqual(presentedAlert?.actions.count, 2)
+        XCTAssertEqual(presentedAlert?.actions.first?.title, "Ok")
+        XCTAssertEqual(presentedAlert?.actions.last?.title, lastTitle)
+
+        presentedAlert?.tapButton(title: lastTitle)
+        XCTAssertEqual(stub.getPokemonsInvocations.count, 2, "The user wanted to try again!")
     }
 
     //MARK: Helper
@@ -86,5 +137,21 @@ private class OneItemCollectionViewModel: CollectionViewModel {
 
     override func item(at indexPath: Foundation.IndexPath) -> CellViewModel {
         CellViewModel(text: text, image: image)
+    }
+}
+
+private class CollectionViewModelSpy: CollectionViewModel {
+
+    private(set) var getPokemonsInvocations = [(Result<(), Error>) -> ()]()
+
+    override func getPokemons(completion: @escaping (Result<(), Error>) -> ()) {
+        getPokemonsInvocations.append(completion)
+    }
+}
+
+private class CollectionViewModelStub: CollectionViewModelSpy {
+
+    func simulateGetPokemonsFailure() {
+        getPokemonsInvocations.first?(Result.failure(NSError(domain: "", code: 0, userInfo: nil)))
     }
 }
