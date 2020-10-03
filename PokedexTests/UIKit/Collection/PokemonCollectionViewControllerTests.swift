@@ -12,15 +12,17 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
     func testRegisterPokemonCell() {
         let sut = makeSUT()
-        let cell = sut.collectionView.dequeueReusableCell(withReuseIdentifier: "PokemonCell", for: IndexPath(item: 0, section: 0)) as? PokemonCollectionViewCell
+        let cell = sut.collectionView.dequeueReusableCell(withReuseIdentifier: "PokemonCell", for: firstIndexPath) as? PokemonCollectionViewCell
 
         XCTAssertNotNil(cell, "The PokemonCell must be registered")
     }
 
-    func testConfiguresCollectionWhitAlwaysContentInsetAdjustmentBehavior() {
+    func testConfiguresCollection() {
         let sut = makeSUT()
 
         XCTAssertEqual(sut.collectionView.contentInsetAdjustmentBehavior, .always)
+        let prefetch = sut.collectionView.prefetchDataSource as? PokemonCollectionViewController
+        XCTAssertEqual(prefetch, sut, "Missing set prefetchDataSource delegate")
     }
     
     func testHasPokedexTitle() {
@@ -59,7 +61,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         let sut = makeSUT(viewModel: viewModel)
 
-        let cell = sut.collectionView(sut.collectionView, cellForItemAt: IndexPath(item: 0, section: 0)) as? PokemonCollectionViewCell
+        let cell = sut.collectionView(sut.collectionView, cellForItemAt: firstIndexPath) as? PokemonCollectionViewCell
 
         XCTAssertNotNil(cell, "The cell must be a PokemonCollectionViewCell")
 
@@ -114,11 +116,35 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         XCTAssertEqual(stub.getPokemonsInvocations.count, 2, "The user wanted to try again!")
     }
 
-    //MARK: Helper
+    func testGetMorePokemonsWhenPrefetchingItems() {
+        let spy = CollectionViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.collectionView(sut.collectionView, prefetchItemsAt: indexPaths)
+
+        XCTAssertEqual(spy.getMorePokemonsIfNeededInvocations.count, 1, "The collection need more Pokemon!")
+        XCTAssertEqual(spy.getMorePokemonsIfNeededInvocations.first, indexPaths)
+    }
+
+    func testCancelGetMorePokemonsWhenCancellingPrefetchOfItems() {
+        let spy = CollectionViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.collectionView(sut.collectionView, cancelPrefetchingForItemsAt: indexPaths)
+
+        XCTAssertEqual(spy.cancelMorePokemonsIfNeededInvocations.count, 1, "The collection cancelled more Pokemon request!")
+        XCTAssertEqual(spy.cancelMorePokemonsIfNeededInvocations.first, indexPaths)
+    }
+
+    //MARK: Helpers
 
     private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel()) -> PokemonCollectionViewController {
         PokemonCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout(), viewModel: viewModel)
     }
+
+    private lazy var firstIndexPath = IndexPath(item: 0, section: 0)
+
+    private lazy var indexPaths = [IndexPath(item: 5, section: 0), IndexPath(item: 10, section: 0), IndexPath(item: 20, section: 0)]
 }
 
 private class OneItemCollectionViewModel: CollectionViewModel {
@@ -143,9 +169,19 @@ private class OneItemCollectionViewModel: CollectionViewModel {
 private class CollectionViewModelSpy: CollectionViewModel {
 
     private(set) var getPokemonsInvocations = [(Result<(), Error>) -> ()]()
+    private(set) var getMorePokemonsIfNeededInvocations = [[IndexPath]]()
+    private(set) var cancelMorePokemonsIfNeededInvocations = [[IndexPath]]()
 
     override func getPokemons(completion: @escaping (Result<(), Error>) -> ()) {
         getPokemonsInvocations.append(completion)
+    }
+
+    override func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+        getMorePokemonsIfNeededInvocations.append(indexPaths)
+    }
+
+    override func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+        cancelMorePokemonsIfNeededInvocations.append(indexPaths)
     }
 }
 
@@ -153,5 +189,16 @@ private class CollectionViewModelStub: CollectionViewModelSpy {
 
     func simulateGetPokemonsFailure() {
         getPokemonsInvocations.first?(Result.failure(NSError(domain: "", code: 0, userInfo: nil)))
+    }
+}
+
+private class OneItemCollectionViewModelSpy: CollectionViewModelSpy {
+
+    override func numberOfItems(in section: Int) -> Int {
+        1
+    }
+
+    override func item(at indexPath: Foundation.IndexPath) -> CellViewModel {
+        CellViewModel(text: "", image: UIImage())
     }
 }

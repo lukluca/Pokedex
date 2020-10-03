@@ -40,6 +40,8 @@ class PokemonCollectionViewController: UICollectionViewController {
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
 
         getPokemons()
+
+        collectionView.prefetchDataSource = self
     }
 
     private func getPokemons() {
@@ -108,6 +110,16 @@ class PokemonCollectionViewController: UICollectionViewController {
         pokemonCell.image = item.image
 
         return pokemonCell
+    }
+}
+
+extension PokemonCollectionViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        viewModel.getMorePokemonsIfNeeded(at: indexPaths)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        viewModel.cancelGetMorePokemonsIfNeeded(at: indexPaths)
     }
 }
 

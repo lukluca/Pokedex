@@ -16,4 +16,10 @@ class CollectionViewModel {
 
     func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
     }
+
+    func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+    }
+
+    func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+    }
 }
