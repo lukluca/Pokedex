@@ -10,6 +10,6 @@ import UIKit
 struct Pokemon {
     let id: Int
     let name: String
-    let image: UIImage
+    let imageData: Data
 }
 

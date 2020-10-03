@@ -27,23 +27,24 @@ class CollectionViewModelTests: XCTestCase {
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
-        let pokemon = Pokemon(id: 0, name: "foo", image: UIImage())
+        let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
+        let pokemon = Pokemon(id: 0, name: "foo", imageData: imageData)
         let mock = PokemonCatcherMock(pokemonList: PokemonList(totalPokemonCount: 1, pokemons: [pokemon]))
         let sut = makeSUT(catcher: mock)
 
         sut.getPokemons { result in
-            if (try? result.get()) != nil {
+            switch result {
+            case .success:
+                XCTAssertEqual(sut.numberOfItems(in: 0), 1)
+                let item = sut.item(at: IndexPath(item: 0, section: 0))
+                XCTAssertEqual(item.text, pokemon.name, "Failure while converting pokemon")
+                XCTAssertEqual(item.image.pngData(), UIImage(data: pokemon.imageData)?.pngData(), "Failure while converting pokemon")
                 expectation.fulfill()
+            case .failure:()
             }
         }
 
         mock.simulateFirstOnSuccess()
-
-        XCTAssertEqual(sut.numberOfItems(in: 0), 1)
-        let item = sut.item(at: IndexPath(item: 0, section: 0))
-        let sameImageInstance = item.image === pokemon.image
-        XCTAssertEqual(item.text, pokemon.name, "Failure while converting pokemon")
-        XCTAssertTrue(sameImageInstance, "Failure while converting pokemon")
 
         wait(for: [expectation], timeout: 0)
     }

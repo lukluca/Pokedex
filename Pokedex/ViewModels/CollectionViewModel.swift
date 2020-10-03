@@ -5,7 +5,7 @@
 //  Created by Luca Tagliabue on 3/10/2020.
 //
 
-import Foundation
+import UIKit
 
 class CollectionViewModel {
 
@@ -31,8 +31,8 @@ class CollectionViewModel {
                 return
             }
             switch result {
-            case .success(let list): ()
-                self.append(list.pokemons.map {self.convert($0)})
+            case .success(let list):
+                self.append(list.pokemons.compactMap {self.convert($0)})
                 completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
@@ -40,8 +40,11 @@ class CollectionViewModel {
         }
     }
 
-    private func convert(_ pokemon: Pokemon) -> CellViewModel {
-        CellViewModel(text: pokemon.name, image: pokemon.image)
+    private func convert(_ pokemon: Pokemon) -> CellViewModel? {
+        guard let image = UIImage(data: pokemon.imageData) else {
+            return nil
+        }
+        return CellViewModel(text: pokemon.name, image: image)
     }
 
     private func append(_ items: [CellViewModel]) {

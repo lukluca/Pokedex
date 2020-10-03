@@ -94,26 +94,21 @@ class DBPokemonCatcherTests: XCTestCase {
         }
     }
 
-    private func makeList(ofSize size: Int) -> DBPokemonList {
-        let pokemons = makeEntities(count:size)
+    private func makeList(ofSize size: Int) throws -> DBPokemonList {
+        let pokemons = try makeEntities(count:size)
         let list = DBPokemonList()
         list.totalPokemonCount = size
         list.pokemons = pokemons
         return list
     }
 
-    private func makeEntities(count: Int) -> List<DBPokemon> {
-        let array = (0 ..< count).compactMap { id -> DBPokemon? in
-            guard let path = Bundle(for: DBPokemon.self).path(forResource: nil, ofType: "png") else {
-                return nil
-            }
-            guard let image = UIImage(contentsOfFile: path) else {
-                return nil
-            }
+    private func makeEntities(count: Int) throws -> List<DBPokemon> {
+        let array = try (0 ..< count).compactMap { id -> DBPokemon? in
+
             let entity = DBPokemon()
             entity.name = "foo_\(id)"
             entity.id = id
-            entity.imageData = image.pngData() ?? Data()
+            entity.imageData = try UIImage.imageResourceAsData(insideBundleOf: DBPokemon.self)
             return entity
         }
 

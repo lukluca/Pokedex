@@ -49,14 +49,14 @@ class DBPokemonCatcher: PokemonCatcher {
             return
         }
 
-        let searchedPokemons = entityList.pokemons.filter { [weak self] (pokemon: DBPokemon) -> Bool in
+        let firstPageEntities = entityList.pokemons.filter { [weak self] (pokemon: DBPokemon) -> Bool in
             guard let self = self else {
                 return false
             }
             return pokemon.id >= 0 && pokemon.id < self.pageSize
         }
 
-        let pokemons = searchedPokemons.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
+        let pokemons = firstPageEntities.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
             self?.convert(entity)
         }
 
@@ -69,11 +69,8 @@ class DBPokemonCatcher: PokemonCatcher {
         completion(Result.success(list))
     }
 
-    private func convert(_ entity: DBPokemon) -> Pokemon? {
-        guard let image = UIImage(data: entity.imageData) else {
-            return nil
-        }
-        return Pokemon(id: entity.id, name: entity.name, image: image)
+    private func convert(_ entity: DBPokemon) -> Pokemon {
+        Pokemon(id: entity.id, name: entity.name, imageData: entity.imageData)
     }
 
     func next() {
