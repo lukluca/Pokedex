@@ -9,7 +9,7 @@ import Foundation
 
 protocol PokemonCatcher {
 
-    func first()
+    func first(completion: @escaping (Result<[Pokemon], Error>) -> Void)
     func next()
 
     func taskOngoingFor(for index: Int) -> Bool

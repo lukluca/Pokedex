@@ -9,7 +9,7 @@ import Foundation
 
 class DBPokemonCatcher: PokemonCatcher {
 
-    func first() {
+    func first(completion: @escaping (Result<[Pokemon], Error>) -> Void) {
     }
 
     func next() {

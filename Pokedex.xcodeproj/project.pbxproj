@@ -11,6 +11,9 @@
 		32DC917BB835AFB1F0194DA2 /* CellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9D17312F23E29DC89661 /* CellViewModel.swift */; };
 		32DC931225900C2B07D86ED7 /* CollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC95CBB4C8E85D86E82D18 /* CollectionViewModelTests.swift */; };
 		32DC948568CAA0391840FA23 /* DBPokemonCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC941629E3F1CAA80A1D42 /* DBPokemonCatcher.swift */; };
+		32DC966715EE4A6200D6E2E5 /* NSError+DummyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC96EB9E3C73549076D68D /* NSError+DummyError.swift */; };
+		32DC97B2DF442AC96CD0727F /* DummyPokemonCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9780D098B31A70961883 /* DummyPokemonCatcher.swift */; };
+		32DC9B8800C7A606824C7DC9 /* XCTestCase+DummyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC93581896CF7A6630BF91 /* XCTestCase+DummyError.swift */; };
 		32DC9C4032DE8DECB232B6CA /* CollectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC97D59052B08A8FA4283D /* CollectionViewModel.swift */; };
 		32DC9C5FDDA2AE196BE21EB5 /* UIAlertController+TapAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9F433792C186352B3C3D /* UIAlertController+TapAction.swift */; };
 		32DC9CEBD73F2F4B8A03AB48 /* PokemonCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9387EF8D7D3C11842EA3 /* PokemonCatcher.swift */; };
@@ -40,9 +43,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		32DC93581896CF7A6630BF91 /* XCTestCase+DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+DummyError.swift"; sourceTree = "<group>"; };
 		32DC9387EF8D7D3C11842EA3 /* PokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC941629E3F1CAA80A1D42 /* DBPokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBPokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC95CBB4C8E85D86E82D18 /* CollectionViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewModelTests.swift; sourceTree = "<group>"; };
+		32DC96EB9E3C73549076D68D /* NSError+DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+DummyError.swift"; sourceTree = "<group>"; };
+		32DC9780D098B31A70961883 /* DummyPokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyPokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC97D59052B08A8FA4283D /* CollectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewModel.swift; sourceTree = "<group>"; };
 		32DC9AE8E50E566CB055B6E5 /* Pokemon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pokemon.swift; sourceTree = "<group>"; };
 		32DC9D17312F23E29DC89661 /* CellViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellViewModel.swift; sourceTree = "<group>"; };
@@ -112,10 +118,20 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		32DC944729EB9A59305B7EDC /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				32DC9780D098B31A70961883 /* DummyPokemonCatcher.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
 		32DC9BE385B3F288DBEFDCF4 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				32DC9F433792C186352B3C3D /* UIAlertController+TapAction.swift */,
+				32DC93581896CF7A6630BF91 /* XCTestCase+DummyError.swift */,
+				32DC96EB9E3C73549076D68D /* NSError+DummyError.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -180,6 +196,7 @@
 				A1597AA02526FDBF0026BCD7 /* Info.plist */,
 				32DC9BE385B3F288DBEFDCF4 /* Helpers */,
 				32DC90DCBC1B3C8457724344 /* ViewModels */,
+				32DC944729EB9A59305B7EDC /* Testing */,
 			);
 			path = PokedexTests;
 			sourceTree = "<group>";
@@ -398,6 +415,9 @@
 				A1597AE0252703360026BCD7 /* MainWindowFactoryTests.swift in Sources */,
 				32DC9C5FDDA2AE196BE21EB5 /* UIAlertController+TapAction.swift in Sources */,
 				32DC931225900C2B07D86ED7 /* CollectionViewModelTests.swift in Sources */,
+				32DC97B2DF442AC96CD0727F /* DummyPokemonCatcher.swift in Sources */,
+				32DC9B8800C7A606824C7DC9 /* XCTestCase+DummyError.swift in Sources */,
+				32DC966715EE4A6200D6E2E5 /* NSError+DummyError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

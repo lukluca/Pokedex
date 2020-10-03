@@ -13,8 +13,8 @@ class PokemonCollectionViewFlowLayoutTests: XCTestCase  {
     func testInitWithRequiredProperties() {
         let sut = PokemonCollectionViewFlowLayout()
 
-        XCTAssertEqual(sut.minimumInteritemSpacing, 20, "The navigation must have one controller")
-        XCTAssertEqual(sut.minimumLineSpacing, 20, "The navigation must have one controller")
-        XCTAssertEqual(sut.sectionInset, UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), "The navigation must have one controller")
+        XCTAssertEqual(sut.minimumInteritemSpacing, 20, "Missing Layout configuration")
+        XCTAssertEqual(sut.minimumLineSpacing, 20, "Missing Layout configuration")
+        XCTAssertEqual(sut.sectionInset, UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), "Missing Layout configuration")
     }
 }

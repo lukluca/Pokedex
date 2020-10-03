@@ -5,11 +5,11 @@
 //  Created by Luca Tagliabue on 3/10/2020.
 //
 
-import Foundation
+import UIKit
 
 struct Pokemon {
     let id: Int
     let name: String
-    let imageURL: URL
+    let image: UIImage
 }
 

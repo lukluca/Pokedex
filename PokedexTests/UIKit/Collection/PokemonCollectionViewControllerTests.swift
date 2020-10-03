@@ -195,18 +195,6 @@ private class CollectionViewModelSpy: CollectionViewModel {
 private class CollectionViewModelStub: CollectionViewModelSpy {
 
     func simulateGetPokemonsFailure() {
-        getPokemonsInvocations.first?(Result.failure(NSError(domain: "", code: 0, userInfo: nil)))
-    }
-}
-
-private class DummyPokemonCatcher: PokemonCatcher {
-    func first() {
-    }
-
-    func next() {
-    }
-
-    func taskOngoingFor(for index: Int) -> Bool {
-        false
+        getPokemonsInvocations.first?(Result.failure(NSError.dummyError))
     }
 }
