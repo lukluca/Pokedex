@@ -138,7 +138,7 @@ extension PokemonCollectionViewController: UICollectionViewDataSourcePrefetching
             guard !newItems.isEmpty else {
                 return
             }
-            self?.collectionView.insertItems(at: newItems)
+            self?.collectionView.reloadItems(at: newItems)
         }
     }
 
