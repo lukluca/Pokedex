@@ -18,7 +18,7 @@ class DBPokemonCatcherTests: XCTestCase {
         Realm.Configuration.defaultConfiguration.inMemoryIdentifier = self.name
     }
 
-    func testIfIsEmptyCallNextHandler() {
+    func testIfThereAreNoPokemonsCallsNextHandler() {
         let spy = PokemonCatcherSpy()
         let sut = makeSUT(nextHandler: spy)
 
@@ -27,8 +27,9 @@ class DBPokemonCatcherTests: XCTestCase {
         XCTAssertEqual(spy.firstPageInvocations.count, 1)
     }
 
-    func testIfIsNotEmptyDoesNotCallNextHandler() throws {
+    func testIfThereArePokemonsDoesNotCallNextHandler() throws {
         try writeInsideDatabase(list: makeList(ofSize: 1))
+        try writeInsideDatabase(pokedex: makePokedex(with: 1))
 
         let spy = PokemonCatcherSpy()
         let sut = makeSUT(nextHandler: spy)
@@ -41,6 +42,7 @@ class DBPokemonCatcherTests: XCTestCase {
     func testRetrievesExpectedPokemonStored() throws {
         let expect = expectation(description: "Completion invocation")
         try writeInsideDatabase(list: makeList(ofSize: 1))
+        try writeInsideDatabase(pokedex: makePokedex(with: 1))
 
         let sut = makeSUT()
 
@@ -63,13 +65,14 @@ class DBPokemonCatcherTests: XCTestCase {
     func testRetrievesOnlyThePokemonPresentedInsideTheFirstPage() throws {
         let expect = expectation(description: "Completion invocation")
         try writeInsideDatabase(list: makeList(ofSize: 100))
+        try writeInsideDatabase(pokedex: makePokedex(with: 3050))
 
         let sut = makeSUT()
 
         sut.firstPage(pageSize: 10) { result in
             switch result {
             case .success(let list):
-                XCTAssertEqual(list.totalPokemonCount, 100)
+                XCTAssertEqual(list.totalPokemonCount, 3050)
                 let pokemons = list.pokemons
                 XCTAssertEqual(pokemons.count, 10)
                 let sorted = pokemons.sorted { (pokemon: Pokemon, pokemon2: Pokemon) -> Bool in
@@ -94,18 +97,31 @@ class DBPokemonCatcherTests: XCTestCase {
     }
 
     private func writeInsideDatabase(list: DBPokemonList) throws {
+        try writeInsideDatabase(object: list)
+    }
+
+    private func writeInsideDatabase(pokedex: DBPokedex) throws {
+        try writeInsideDatabase(object: pokedex)
+    }
+
+    private func writeInsideDatabase(object: Object) throws {
         let database = try Realm()
         try database.write {
-            database.add(list)
+            database.add(object)
         }
     }
 
     private func makeList(ofSize size: Int) throws -> DBPokemonList {
         let pokemons = try makeEntities(count:size)
         let list = DBPokemonList()
-        list.totalPokemonCount = size
         list.pokemons = pokemons
         return list
+    }
+
+    private func makePokedex(with total: Int) throws -> DBPokedex {
+        let pokedex = DBPokedex()
+        pokedex.totalPokemonCount = total
+        return pokedex
     }
 
     private func makeEntities(count: Int) throws -> List<DBPokemon> {
