@@ -680,7 +680,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 54BF42F65E08ED1891F66E47 /* Pods-PokedexTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = PokedexTests/Info.plist;
@@ -702,7 +701,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 67FA8486DF031185A1BCF93D /* Pods-PokedexTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = PokedexTests/Info.plist;
