@@ -27,7 +27,7 @@ class CollectionViewModelTests: XCTestCase {
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
-        let pokemon = try makeAPokemon(withId: 1)
+        let pokemon = try makeAPokemon(withId: 1, name: "foo")
         let list = makeAPokemonList(withTotalPokemonCount: 100, andOnlyOnePokemon: pokemon)
         let mock = PokemonCatcherMock(pokemonList: list)
         let sut = makeSUT(catcher: mock)
@@ -37,7 +37,7 @@ class CollectionViewModelTests: XCTestCase {
             case .success:
                 XCTAssertEqual(sut.numberOfItems(in: 0), 100, "numberOfItems must be equal to totalPokemonCount")
                 let item = sut.item(at: IndexPath(item: 0, section: 0))
-                XCTAssertEqual(item?.text, pokemon.name, "Failure while converting pokemon")
+                XCTAssertEqual(item?.text, "Foo", "Failure while converting pokemon")
                 XCTAssertEqual(item?.image.pngData(), UIImage(data: pokemon.imageData)?.pngData(), "Failure while converting pokemon")
                 let nilItem = sut.item(at: IndexPath(item: 1, section: 0))
                 XCTAssertNil(nilItem, "Item must be nil if pokemon is no present inside data source")
@@ -194,7 +194,7 @@ class CollectionViewModelTests: XCTestCase {
         PokemonList(totalPokemonCount: count, pokemons: [pokemon])
     }
 
-    private func makeAPokemon(withId id: Int) throws -> Pokemon {
+    private func makeAPokemon(withId id: Int, name: String = "foo") throws -> Pokemon {
         let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
         return Pokemon(id: id, name: "foo", imageData: imageData)
     }

@@ -51,7 +51,7 @@ class CollectionViewModel {
         guard let image = UIImage(data: pokemon.imageData) else {
             return nil
         }
-        return CellViewModel(id: pokemon.id, text: pokemon.name, image: image)
+        return CellViewModel(id: pokemon.id, text: pokemon.name.firstUppercase, image: image)
     }
 
     private func append(_ items: [CellViewModel]) {
@@ -107,4 +107,8 @@ class CollectionViewModel {
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
     }
+}
+
+private extension StringProtocol {
+    var firstUppercase: String { prefix(1).uppercased() + dropFirst() }
 }
