@@ -3,6 +3,7 @@
 import UIKit
 
 struct CellViewModel {
+    let id: Int
     let text: String
     let image: UIImage
 }

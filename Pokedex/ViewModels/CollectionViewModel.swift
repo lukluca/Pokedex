@@ -24,10 +24,9 @@ class CollectionViewModel {
     }
 
     func item(at indexPath: IndexPath) -> CellViewModel? {
-        guard indexPath.row < cellViewModels.count else {
-            return nil
+        cellViewModels.first { (model: CellViewModel) -> Bool in
+            model.id == indexPath.row
         }
-        return cellViewModels[indexPath.row]
     }
 
     func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -50,7 +49,7 @@ class CollectionViewModel {
         guard let image = UIImage(data: pokemon.imageData) else {
             return nil
         }
-        return CellViewModel(text: pokemon.name, image: image)
+        return CellViewModel(id: pokemon.id, text: pokemon.name, image: image)
     }
 
     private func append(_ items: [CellViewModel]) {
@@ -59,7 +58,16 @@ class CollectionViewModel {
 
 
     func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
-        //or the task for the selected index is ongoing or we have already the data
+//        let atLeastOneTaskNotOngoing = indexPaths.map { path -> Bool in
+//            catcher.taskOngoingFor(for: path.item)
+//        }.first { !$0 }
+//
+//        indexPaths.map { path -> Bool in
+//            cellViewModels
+//            cellViewModels[path.item] != nil
+//        }
+
+        //or the task for the given indexes are ongoing or we have already the data
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {

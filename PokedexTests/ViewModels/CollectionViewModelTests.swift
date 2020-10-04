@@ -71,6 +71,22 @@ class CollectionViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
+    func testGetsNilItemWhenQueryingAnHoleInsideDataSource() throws {
+        let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
+        let pokemon = Pokemon(id: 8, name: "foo", imageData: imageData)
+        let list = PokemonList(totalPokemonCount: 10, pokemons: [pokemon])
+        let mock = PokemonCatcherMock(pokemonList: list)
+        let sut = makeSUT(catcher: mock)
+
+        sut.getPokemons { result in }
+
+        mock.simulateFirstOnSuccess()
+
+        let item = sut.item(at: IndexPath(item: 5, section: 0))
+
+        XCTAssertNil(item, "Item must be nil")
+    }
+
     //MARK: Helpers
 
     private func makeSUT(catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {

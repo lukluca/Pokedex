@@ -57,7 +57,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
     func testBindingCellFromCellViewModel() {
         let text = "foo"
         let image = UIImage()
-        let viewModel = OneItemCollectionViewModel(text: text, image: image)
+        let viewModel = OneItemCollectionViewModel(id: 0, text: text, image: image)
 
         let sut = makeSUT(viewModel: viewModel)
 
@@ -77,8 +77,8 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         let cell = sut.collectionView(sut.collectionView, cellForItemAt: firstIndexPath) as? PokemonCollectionViewCell
 
         XCTAssertNotNil(cell, "The cell must be a PokemonCollectionViewCell")
-        XCTAssertNil(cell?.name, "Missing binding with cell")
-        XCTAssertNil(cell?.image, "Missing binding with cell")
+        XCTAssertNil(cell?.name, "Cell must not be binded")
+        XCTAssertNil(cell?.image, "Cell must not be binded")
     }
 
     func testOnViewDidLoadGetsPokemon() {
@@ -176,10 +176,12 @@ private class FilledCollectionViewModelWithEmptyCells: CollectionViewModel {
 
 private class OneItemCollectionViewModel: CollectionViewModel {
 
+    private let id: Int
     private let text: String
     private let image: UIImage
 
-    init(text: String, image: UIImage) {
+    init(id: Int, text: String, image: UIImage) {
+        self.id = id
         self.text = text
         self.image = image
         super.init(catcher: DummyPokemonCatcher())
@@ -190,7 +192,7 @@ private class OneItemCollectionViewModel: CollectionViewModel {
     }
 
     override func item(at indexPath: IndexPath) -> CellViewModel? {
-        CellViewModel(text: text, image: image)
+        CellViewModel(id: id, text: text, image: image)
     }
 }
 
