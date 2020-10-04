@@ -24,16 +24,13 @@ struct RemotePokemonList {
 
 class RemotePokemonCatcher: PokemonCatcher {
 
-    private let pageSize: Int
-
     private let pokemonAPI = PokemonAPI()
 
-    init(pageSize: Int) {
-        self.pageSize = pageSize
+    init() {
     }
 
-    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {
-        firstPageFromAPI { result in
+    func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
+        firstPageFromAPI(pageSize: pageSize) { result in
             switch result {
             case .success(let remoteList):
                 var pokemons = [Pokemon]()
@@ -78,7 +75,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         }
     }
 
-    private func firstPageFromAPI(completion: @escaping (Result<RemotePokemonList, Error>) -> Void) {
+    private func firstPageFromAPI(pageSize: Int, completion: @escaping (Result<RemotePokemonList, Error>) -> Void) {
         let state = PaginationState<PKMPokemon>.initial(pageLimit: pageSize)
         pokemonAPI.pokemonService.fetchPokemonList(paginationState: state) { [weak self] (result: Result<PKMPagedObject<PKMPokemon>, Error>) in
             guard let self = self else {
@@ -142,7 +139,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         task.resume()
     }
 
-    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
 
     }
 

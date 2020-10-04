@@ -93,7 +93,7 @@ class CollectionViewModelTests: XCTestCase {
         sut.getMorePokemonsIfNeeded(for: [IndexPath(item: index, section: 0)]) { result in }
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, index, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
+        XCTAssertEqual(mock.pageInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
     }
 
     func testDoesntGetsMorePokemonIfTheDataIsAlreadyCatched() throws {
@@ -114,26 +114,28 @@ class CollectionViewModelTests: XCTestCase {
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
+        XCTAssertEqual(mock.pageInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
 
         wait(for: [expectation], timeout: 0)
     }
 
     func testGetsMorePokemonIfTheDataIsNotAlreadyCatched() throws {
+        let pageSize = 50
         let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 9)
         let mock = PokemonCatcherMock(pokemonList: list)
-        let sut = makeSUT(catcher: mock)
+        let sut = makeSUT(pageSize: pageSize, catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        let item = 7
+        let item = 57
         sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { _ in}
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.pageThatContainsInvocations.count, 1, "Missing load of the required page")
-        XCTAssertEqual(mock.pageThatContainsInvocations.first?.indexes.first, item, "Missing load of the required page")
+        XCTAssertEqual(mock.pageInvocations.count, 1, "Missing load of the required page")
+        XCTAssertEqual(mock.pageInvocations.first?.number, 1, "Missing load of the required page")
+        XCTAssertEqual(mock.pageInvocations.first?.pageSize, pageSize, "Missing load of the required page")
     }
 
     func testGetsMorePokemonCompletingWithSuccess() throws {
@@ -141,7 +143,7 @@ class CollectionViewModelTests: XCTestCase {
         let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 20)
         let pokemon = try makeAPokemon(withId: 12)
         let mock = PokemonCatcherMock(pokemonList: list, pokemons: [pokemon])
-        let sut = makeSUT(catcher: mock)
+        let sut = makeSUT(pageSize: 50, catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
@@ -163,7 +165,7 @@ class CollectionViewModelTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Completion invoked")
         let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 20)
         let mock = PokemonCatcherMock(pokemonList: list, error: dummyError)
-        let sut = makeSUT(catcher: mock)
+        let sut = makeSUT(pageSize: 50, catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
@@ -180,8 +182,8 @@ class CollectionViewModelTests: XCTestCase {
 
     //MARK: Helpers
 
-    private func makeSUT(catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
-        CollectionViewModel(catcher: catcher)
+    private func makeSUT(pageSize: Int = 0, catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
+        CollectionViewModel(pageSize: pageSize, catcher: catcher)
     }
 
     private func makeAPokemonList(withTotalPokemonCount count: Int, andOnlyOnePokemonWithId id: Int) throws -> PokemonList {
@@ -250,27 +252,27 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
         guard let list = pokemonList else {
             return
         }
-        firstPageInvocations.first?(Result.success(list))
+        firstPageInvocations.first?.completion(Result.success(list))
     }
 
     func simulateFirstPageOnFailure() {
         guard let error = error else {
             return
         }
-        firstPageInvocations.first?(Result.failure(error))
+        firstPageInvocations.first?.completion(Result.failure(error))
     }
 
     func simulateNextPageOnSuccess() {
         guard let pokemons = pokemons else {
             return
         }
-        pageThatContainsInvocations.first?.completion(Result.success(pokemons))
+        pageInvocations.first?.completion(Result.success(pokemons))
     }
 
     func simulateNextPageOnFailure() {
         guard let error = error else {
             return
         }
-        pageThatContainsInvocations.first?.completion(Result.failure(error))
+        pageInvocations.first?.completion(Result.failure(error))
     }
 }

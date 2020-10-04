@@ -9,19 +9,20 @@ import UIKit
 
 class CollectionViewModel {
 
-    private var cellViewModels = [CellViewModel]()
-
-    //rename
-    private var numberOfItems = 0
-
+    private let pageSize: Int
     private let catcher: PokemonCatcher
 
-    init(catcher: PokemonCatcher) {
+    private var cellViewModels = [CellViewModel]()
+
+    private var totalNumberOfItems = 0
+
+    init(pageSize: Int, catcher: PokemonCatcher) {
+        self.pageSize = pageSize
         self.catcher = catcher
     }
 
     func numberOfItems(in section: Int) -> Int {
-        numberOfItems
+        totalNumberOfItems
     }
 
     func item(at indexPath: IndexPath) -> CellViewModel? {
@@ -31,13 +32,13 @@ class CollectionViewModel {
     }
 
     func getPokemons(completion: @escaping (Result<Void, Error>) -> Void) {
-        catcher.firstPage { [weak self] result in
+        catcher.firstPage(pageSize: pageSize) { [weak self] result in
             guard let self = self else {
                 return
             }
             switch result {
             case .success(let list):
-                self.numberOfItems = list.totalPokemonCount
+                self.totalNumberOfItems = list.totalPokemonCount
                 self.append(list.pokemons.compactMap {self.convert($0)})
                 completion(.success(()))
             case .failure(let error):
@@ -68,20 +69,13 @@ class CollectionViewModel {
 
         if !indexPathsWithoutATask.isEmpty && !indexPathsWithoutAnItem.isEmpty {
             let indexes = Array(Set(indexPathsWithoutATask + indexPathsWithoutAnItem)).map { $0.item }.sorted()
-            catcher.pageThatContains(indexes: indexes) { [weak self] result in
-                guard let self = self else {
-                    return
-                }
-                switch result {
-                case .success(let pokemons):
-                    let newIndexes = pokemons.map { pokemon -> IndexPath in
-                        let item = self.convertIntoIndex(id: pokemon.id)
-                        return IndexPath(item: item, section: 0)
-                    }
-                    completion(newIndexes)
-                case .failure:
-                    completion([])
-                }
+            let pages = indexes.map { (i: Int) -> Int in
+              Int(floor(Double(i) / Double(pageSize)))
+            }
+            let uniqueSortedPageNumbers = Array(Set(pages)).sorted()
+
+            uniqueSortedPageNumbers.forEach { (pageNumber: Int) in
+                getPage(number: pageNumber, completion: completion)
             }
         } else {
             completion([])
@@ -90,6 +84,24 @@ class CollectionViewModel {
 
     private func convertIntoIndex(id: Int) -> Int {
         id - 1
+    }
+
+    private func getPage(number: Int, completion: @escaping ([IndexPath]) -> Void) {
+        catcher.page(pageSize: pageSize, number: number) { [weak self] result in
+            guard let self = self else {
+                return
+            }
+            switch result {
+            case .success(let pokemons):
+                let newIndexes = pokemons.map { pokemon -> IndexPath in
+                    let item = self.convertIntoIndex(id: pokemon.id)
+                    return IndexPath(item: item, section: 0)
+                }
+                completion(newIndexes)
+            case .failure:
+                completion([])
+            }
+        }
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {

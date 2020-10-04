@@ -9,8 +9,8 @@ import Foundation
 
 protocol PokemonCatcher {
 
-    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void)
-    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void)
+    func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void)
+    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void)
 
     func taskOngoingFor(for index: Int) -> Bool
 }

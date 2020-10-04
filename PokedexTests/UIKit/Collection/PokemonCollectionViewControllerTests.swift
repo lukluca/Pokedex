@@ -150,7 +150,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
     //MARK: Helpers
 
-    private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel(catcher: DummyPokemonCatcher())) -> PokemonCollectionViewController {
+    private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel(pageSize: 50, catcher: DummyPokemonCatcher())) -> PokemonCollectionViewController {
         PokemonCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout(), viewModel: viewModel)
     }
 
@@ -162,7 +162,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 private class FilledCollectionViewModelWithEmptyCells: CollectionViewModel {
 
     init() {
-        super.init(catcher: DummyPokemonCatcher())
+        super.init(pageSize: 50, catcher: DummyPokemonCatcher())
     }
 
     override func numberOfItems(in section: Int) -> Int {
@@ -184,7 +184,7 @@ private class OneItemCollectionViewModel: CollectionViewModel {
         self.id = id
         self.text = text
         self.image = image
-        super.init(catcher: DummyPokemonCatcher())
+        super.init(pageSize: 50, catcher: DummyPokemonCatcher())
     }
 
     override func numberOfItems(in section: Int) -> Int {
@@ -203,7 +203,7 @@ private class CollectionViewModelSpy: CollectionViewModel {
     private(set) var cancelMorePokemonsIfNeededInvocations = [[IndexPath]]()
 
     init() {
-        super.init(catcher: DummyPokemonCatcher())
+        super.init(pageSize: 50, catcher: DummyPokemonCatcher())
     }
 
     override func getPokemons(completion: @escaping (Result<(), Error>) -> ()) {

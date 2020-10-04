@@ -10,6 +10,7 @@ import UIKit
 
 enum DBError: Error {
     case firstPokemons
+    case nextPagePokemons
 }
 
 class DBPokemon: Object {
@@ -29,51 +30,79 @@ class DBPokemonList: Object {
 
 class DBPokemonCatcher: PokemonCatcher {
 
-    private let pageSize: Int
     private let nextHandler: PokemonCatcher
 
     private var database: Realm? {
         try? Realm()
     }
 
-    init(pageSize: Int, nextHandler: PokemonCatcher) {
-        self.pageSize = pageSize
+    init(nextHandler: PokemonCatcher) {
         self.nextHandler = nextHandler
     }
 
-    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {
+    func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
         let results = database?.objects(DBPokemonList.self)
 
         guard let entityList = results?.first, !entityList.pokemons.isEmpty else {
-            nextHandler.firstPage(completion: completion)
+            nextHandler.firstPage(pageSize: pageSize, completion: completion)
             return
         }
 
-        let firstPageEntities = entityList.pokemons.filter { [weak self] (pokemon: DBPokemon) -> Bool in
-            guard let self = self else {
-                return false
-            }
-            return pokemon.id >= 0 && pokemon.id < self.pageSize
-        }
+        let entitiesInsideFirstPage = readPage(pageSize: pageSize, number: 0, from: entityList)
 
-        let pokemons = firstPageEntities.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
-            self?.convert(entity)
-        }
+        let pokemonsInsideFirstPage = convert(entitiesInsideFirstPage)
 
-        guard !pokemons.isEmpty else {
+        guard !pokemonsInsideFirstPage.isEmpty else {
             completion(Result.failure(DBError.firstPokemons))
             return
         }
 
-        let list = PokemonList(totalPokemonCount: entityList.totalPokemonCount, pokemons: Array(pokemons))
+        let list = PokemonList(totalPokemonCount: entityList.totalPokemonCount, pokemons: Array(pokemonsInsideFirstPage))
         completion(Result.success(list))
+    }
+
+    private func convert(_ entities: [DBPokemon]) -> [Pokemon] {
+        entities.compactMap { [weak self] (entity: DBPokemon) -> Pokemon? in
+            self?.convert(entity)
+        }
     }
 
     private func convert(_ entity: DBPokemon) -> Pokemon {
         Pokemon(id: entity.id, name: entity.name, imageData: entity.imageData)
     }
 
-    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+        let results = database?.objects(DBPokemonList.self)
+
+        guard let entityList = results?.first, !entityList.pokemons.isEmpty else {
+            completion(Result.failure(DBError.nextPagePokemons))
+            return
+        }
+
+        let entitiesInsidePage = readPage(pageSize: pageSize, number: number, from: entityList)
+        let pokemonsInsidePage = convert(entitiesInsidePage)
+
+//        let pokemons: [Pokemon] = uniqueSortedPages.map { (number: Int) -> [Pokemon] in
+//            let entitiesInsidePage = readPage(number: number, from: entityList)
+//            return convert(entitiesInsidePage)
+//        }.reduce([], +).sorted { (element: Pokemon, element2: Pokemon) -> Bool in
+//            element.id < element2.id
+//        }
+
+        guard !pokemonsInsidePage.isEmpty else {
+            completion(Result.failure(DBError.nextPagePokemons))
+            return
+        }
+
+        completion(Result.success(pokemonsInsidePage))
+    }
+
+    private func readPage(pageSize: Int, number: Int, from entityList: DBPokemonList) -> [DBPokemon] {
+        let entitiesInsidePage = entityList.pokemons.filter { (pokemon: DBPokemon) -> Bool in
+            pokemon.id >= (number * pageSize) && pokemon.id < ((number + 1) * pageSize)
+        }
+
+        return Array(entitiesInsidePage)
     }
 
     func taskOngoingFor(for index: Int) -> Bool {

@@ -9,16 +9,16 @@
 
 class PokemonCatcherSpy: PokemonCatcher {
 
-    private(set) var firstPageInvocations = [(Result<PokemonList, Error>) -> Void]()
-    private(set) var pageThatContainsInvocations = [(indexes: [Int], completion: (Result<[Pokemon], Error>) -> Void)]()
+    private(set) var firstPageInvocations = [(pageSize: Int, completion: (Result<PokemonList, Error>) -> Void)]()
+    private(set) var pageInvocations = [(pageSize: Int, number: Int, completion: (Result<[Pokemon], Error>) -> Void)]()
     private(set) var taskOngoingForInvocations = [Int]()
 
-    func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {
-        firstPageInvocations.append(completion)
+    func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
+        firstPageInvocations.append((pageSize, completion))
     }
 
-    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void) {
-        pageThatContainsInvocations.append((indexes, completion))
+    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+        pageInvocations.append((pageSize, number, completion))
     }
 
     func taskOngoingFor(for index: Int) -> Bool {

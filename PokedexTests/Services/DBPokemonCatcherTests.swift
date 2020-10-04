@@ -20,9 +20,9 @@ class DBPokemonCatcherTests: XCTestCase {
 
     func testIfIsEmptyCallNextHandler() {
         let spy = PokemonCatcherSpy()
-        let sut = DBPokemonCatcher(pageSize: 10, nextHandler: spy)
+        let sut = makeSUT(nextHandler: spy)
 
-        sut.firstPage { result in }
+        sut.firstPage(pageSize: 10) { result in }
 
         XCTAssertEqual(spy.firstPageInvocations.count, 1)
     }
@@ -31,9 +31,9 @@ class DBPokemonCatcherTests: XCTestCase {
         try writeInsideDatabase(list: makeList(ofSize: 1))
 
         let spy = PokemonCatcherSpy()
-        let sut = DBPokemonCatcher(pageSize: 10, nextHandler: spy)
+        let sut = makeSUT(nextHandler: spy)
 
-        sut.firstPage { result in }
+        sut.firstPage(pageSize: 10) { result in }
 
         XCTAssertEqual(spy.firstPageInvocations.count, 0)
     }
@@ -42,9 +42,9 @@ class DBPokemonCatcherTests: XCTestCase {
         let expect = expectation(description: "Completion invocation")
         try writeInsideDatabase(list: makeList(ofSize: 1))
 
-        let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
+        let sut = makeSUT()
 
-        sut.firstPage { result in
+        sut.firstPage(pageSize: 10) { result in
             switch result {
             case .success(let list):
                 XCTAssertEqual(list.totalPokemonCount, 1)
@@ -64,9 +64,9 @@ class DBPokemonCatcherTests: XCTestCase {
         let expect = expectation(description: "Completion invocation")
         try writeInsideDatabase(list: makeList(ofSize: 100))
 
-        let sut = DBPokemonCatcher(pageSize: 10, nextHandler: DummyPokemonCatcher())
+        let sut = makeSUT()
 
-        sut.firstPage { result in
+        sut.firstPage(pageSize: 10) { result in
             switch result {
             case .success(let list):
                 XCTAssertEqual(list.totalPokemonCount, 100)
@@ -85,6 +85,12 @@ class DBPokemonCatcherTests: XCTestCase {
         }
 
         wait(for: [expect], timeout: 0)
+    }
+
+    //MARK: Helpers
+
+    private func makeSUT(nextHandler: PokemonCatcher = DummyPokemonCatcher()) -> DBPokemonCatcher {
+        DBPokemonCatcher(nextHandler: nextHandler)
     }
 
     private func writeInsideDatabase(list: DBPokemonList) throws {
