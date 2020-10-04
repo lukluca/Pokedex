@@ -142,7 +142,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         task.resume()
     }
 
-    func pageThatContains(indexes: [Int]) {
+    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void) {
 
     }
 

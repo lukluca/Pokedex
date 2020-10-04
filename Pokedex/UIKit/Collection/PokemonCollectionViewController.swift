@@ -134,7 +134,12 @@ class PokemonCollectionViewController: UICollectionViewController {
 
 extension PokemonCollectionViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        viewModel.getMorePokemonsIfNeeded(at: indexPaths)
+        viewModel.getMorePokemonsIfNeeded(for: indexPaths) { [weak self] newItems in
+            guard !newItems.isEmpty else {
+                return
+            }
+            self?.collectionView.insertItems(at: newItems)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {

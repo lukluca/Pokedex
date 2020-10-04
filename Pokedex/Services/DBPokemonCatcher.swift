@@ -73,7 +73,7 @@ class DBPokemonCatcher: PokemonCatcher {
         Pokemon(id: entity.id, name: entity.name, imageData: entity.imageData)
     }
 
-    func pageThatContains(indexes: [Int]) {
+    func pageThatContains(indexes: [Int], completion: @escaping (Result<[Pokemon], Error>) -> Void) {
     }
 
     func taskOngoingFor(for index: Int) -> Bool {

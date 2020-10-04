@@ -11,6 +11,7 @@ class CollectionViewModel {
 
     private var cellViewModels = [CellViewModel]()
 
+    //rename
     private var numberOfItems = 0
 
     private let catcher: PokemonCatcher
@@ -56,7 +57,7 @@ class CollectionViewModel {
         cellViewModels.append(contentsOf: items)
     }
 
-    func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+    func getMorePokemonsIfNeeded(for indexPaths: [IndexPath], completion: @escaping ([IndexPath]) -> Void) {
         let indexPathsWithoutATask = indexPaths.filter { path -> Bool in
             !catcher.taskOngoingFor(for: path.item)
         }
@@ -67,7 +68,11 @@ class CollectionViewModel {
 
         if !indexPathsWithoutATask.isEmpty && !indexPathsWithoutAnItem.isEmpty {
             let indexes = Array(Set(indexPathsWithoutATask + indexPathsWithoutAnItem)).map { $0.item }.sorted()
-            catcher.pageThatContains(indexes: indexes)
+            catcher.pageThatContains(indexes: indexes) { result in
+                completion([])
+            }
+        } else {
+            completion([])
         }
     }
 

@@ -210,7 +210,7 @@ private class CollectionViewModelSpy: CollectionViewModel {
         getPokemonsInvocations.append(completion)
     }
 
-    override func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+    override func getMorePokemonsIfNeeded(for indexPaths: [IndexPath], completion: @escaping ([IndexPath]) -> Void) {
         getMorePokemonsIfNeededInvocations.append(indexPaths)
     }
 
