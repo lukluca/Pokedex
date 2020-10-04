@@ -90,15 +90,14 @@ class CollectionViewModelTests: XCTestCase {
         let mock = PokemonCatcherMock(taskOngoingForIndex: index)
         let sut = makeSUT(catcher: mock)
 
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: index, section: 0)]) { result in
-
-        }
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: index, section: 0)]) { result in }
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, index, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
     }
 
     func testDoesntGetsMorePokemonIfTheDataIsAlreadyCatched() throws {
+        let expectation = XCTestExpectation(description: "Completion invoked")
         let id = 8
         let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: id)
         let mock = PokemonCatcherMock(pokemonList: list)
@@ -108,10 +107,16 @@ class CollectionViewModelTests: XCTestCase {
         mock.simulateFirstPageOnSuccess()
 
         let item = (id - 1)
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { result in }
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { newItems in
+            XCTAssertTrue(newItems.isEmpty)
+            expectation.fulfill()
+        }
+
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
+
+        wait(for: [expectation], timeout: 0)
     }
 
     func testGetsMorePokemonIfTheDataIsNotAlreadyCatched() throws {
@@ -123,7 +128,7 @@ class CollectionViewModelTests: XCTestCase {
         mock.simulateFirstPageOnSuccess()
 
         let item = 7
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { result in }
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { _ in}
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
@@ -132,17 +137,45 @@ class CollectionViewModelTests: XCTestCase {
     }
 
     func testGetsMorePokemonCompletingWithSuccess() throws {
-        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 8)
-        let mock = PokemonCatcherMock(pokemonList: list)
+        let expectation = XCTestExpectation(description: "Completion invoked")
+        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 20)
+        let pokemon = try makeAPokemon(withId: 12)
+        let mock = PokemonCatcherMock(pokemonList: list, pokemons: [pokemon])
         let sut = makeSUT(catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        let itemIndex = 7
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: itemIndex, section: 0)]) { newItems in }
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: 7, section: 0)]) { newItems in
+            XCTAssertEqual(newItems.count, 1)
+            XCTAssertEqual(newItems.first, IndexPath(item: 11, section: 0))
+            expectation.fulfill()
+        }
 
         mock.simulateNextPageOnSuccess()
+
+        wait(for:
+
+        [expectation], timeout: 0)
+    }
+
+    func testGetsMorePokemonCompletingWithFailure() throws {
+        let expectation = XCTestExpectation(description: "Completion invoked")
+        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 20)
+        let mock = PokemonCatcherMock(pokemonList: list, error: dummyError)
+        let sut = makeSUT(catcher: mock)
+
+        sut.getPokemons { result in  }
+        mock.simulateFirstPageOnSuccess()
+
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: 7, section: 0)]) { newItems in
+            XCTAssertTrue(newItems.isEmpty)
+            expectation.fulfill()
+        }
+
+        mock.simulateNextPageOnFailure()
+
+        wait(for: [expectation], timeout: 0)
     }
 
     //MARK: Helpers
@@ -199,6 +232,13 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
         self.error = nil
         self.taskOngoingForIndex = nil
         self.pokemons = pokemons
+    }
+
+    init(pokemonList: PokemonList, error: Error) {
+        self.pokemonList = pokemonList
+        self.error = error
+        self.taskOngoingForIndex = nil
+        self.pokemons = nil
     }
 
     override func taskOngoingFor(for index: Int) -> Bool {

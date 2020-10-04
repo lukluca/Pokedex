@@ -26,7 +26,7 @@ class CollectionViewModel {
 
     func item(at indexPath: IndexPath) -> CellViewModel? {
         cellViewModels.first { (model: CellViewModel) -> Bool in
-            (model.id - 1) == indexPath.row
+            convertIntoIndex(id: model.id) == indexPath.row
         }
     }
 
@@ -68,12 +68,28 @@ class CollectionViewModel {
 
         if !indexPathsWithoutATask.isEmpty && !indexPathsWithoutAnItem.isEmpty {
             let indexes = Array(Set(indexPathsWithoutATask + indexPathsWithoutAnItem)).map { $0.item }.sorted()
-            catcher.pageThatContains(indexes: indexes) { result in
-                completion([])
+            catcher.pageThatContains(indexes: indexes) { [weak self] result in
+                guard let self = self else {
+                    return
+                }
+                switch result {
+                case .success(let pokemons):
+                    let newIndexes = pokemons.map { pokemon -> IndexPath in
+                        let item = self.convertIntoIndex(id: pokemon.id)
+                        return IndexPath(item: item, section: 0)
+                    }
+                    completion(newIndexes)
+                case .failure:
+                    completion([])
+                }
             }
         } else {
             completion([])
         }
+    }
+
+    private func convertIntoIndex(id: Int) -> Int {
+        id - 1
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
