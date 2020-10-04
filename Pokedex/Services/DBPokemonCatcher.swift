@@ -87,7 +87,7 @@ class DBPokemonCatcher: PokemonCatcher {
         let pokemonsInsidePage = readPokemonsInsidePage(pageSize: pageSize, number: number, from: entityList)
 
         guard !pokemonsInsidePage.isEmpty else {
-            completion(Result.failure(DBError.nextPagePokemons))
+            nextHandler.page(pageSize: pageSize, number: number, completion: completion)
             return
         }
 
@@ -95,11 +95,11 @@ class DBPokemonCatcher: PokemonCatcher {
     }
 
     private func readPokemonsInsidePage(pageSize: Int, number: Int, from entityList: DBPokemonList) -> [Pokemon] {
-        let entitiesInsidePage = readPage(pageSize: pageSize, number: number, from: entityList)
+        let entitiesInsidePage = read(pageSize: pageSize, number: number, from: entityList)
         return convert(entitiesInsidePage)
     }
 
-    private func readPage(pageSize: Int, number: Int, from entityList: DBPokemonList) -> [DBPokemon] {
+    private func read(pageSize: Int, number: Int, from entityList: DBPokemonList) -> [DBPokemon] {
         let entitiesInsidePage = entityList.pokemons.filter { (pokemon: DBPokemon) -> Bool in
             pokemon.id >= (number * pageSize) && pokemon.id < ((number + 1) * pageSize)
         }

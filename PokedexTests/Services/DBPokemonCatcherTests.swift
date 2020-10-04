@@ -90,6 +90,58 @@ class DBPokemonCatcherTests: XCTestCase {
         wait(for: [expect], timeout: 0)
     }
 
+    func testIfThereAreNoPokemonsAtAllWhileReadingAPageCompletesWhitError() {
+        let expect = expectation(description: "Completion invocation")
+        let sut = makeSUT()
+
+        sut.page(pageSize: 50, number: 2) { result in
+            switch result {
+            case .success: ()
+            case .failure:
+                expect.fulfill()
+            }
+        }
+
+        wait(for: [expect], timeout: 0)
+    }
+
+    func testIfThePageIsNotStoredCallsNextHandler() throws {
+        let pageSize = 50
+        try writeInsideDatabase(list: makeList(ofSize: pageSize))
+
+        let spy = PokemonCatcherSpy()
+        let sut = makeSUT(nextHandler: spy)
+
+        sut.page(pageSize: pageSize, number: 1) { result in }
+
+        XCTAssertEqual(spy.pageInvocations.count, 1)
+    }
+
+    func testIfThePageIsStoredCompletesWhitPokemonsInsideThePage() throws {
+        let pageSize = 50
+        try writeInsideDatabase(list: makeList(ofSize: 3 * pageSize))
+        let expect = expectation(description: "Completion invocation")
+        let sut = makeSUT()
+
+        sut.page(pageSize: pageSize, number: 1) { result in
+            switch result {
+            case .success(let pokemons):
+                XCTAssertEqual(pokemons.count, 50)
+                let sorted = pokemons.sorted { (pokemon: Pokemon, pokemon2: Pokemon) -> Bool in
+                    pokemon.id < pokemon2.id
+                }
+                XCTAssertEqual(sorted.first?.id, 50)
+                XCTAssertEqual(sorted.first?.name, "foo_50")
+                XCTAssertEqual(sorted.last?.id, 99)
+                XCTAssertEqual(sorted.last?.name, "foo_99")
+                expect.fulfill()
+            case .failure: ()
+            }
+        }
+
+        wait(for: [expect], timeout: 0)
+    }
+
     //MARK: Helpers
 
     private func makeSUT(nextHandler: PokemonCatcher = DummyPokemonCatcher()) -> DBPokemonCatcher {
