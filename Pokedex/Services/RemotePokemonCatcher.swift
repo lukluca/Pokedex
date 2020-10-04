@@ -7,8 +7,12 @@
 
 import PokemonAPI
 
+typealias PageCompletion = (Result<(totalCount: Int, list: [RemotePokemon]), Error>) -> Void
+
 enum RemoteError: Error {
     case firstPokemons
+    case nextPagePokemons
+    case emptyPokemons
 }
 
 struct RemotePokemon {
@@ -17,80 +21,139 @@ struct RemotePokemon {
     let imageURL: String?
 }
 
-struct RemotePokemonList {
-    let totalPokemonCount: Int?
-    let pokemons: [RemotePokemon]
-}
+//struct RemotePokemonList {
+  //  let totalPokemonCount: Int?
+  //  let pokemons: [RemotePokemon]
+//}
 
 class RemotePokemonCatcher: PokemonCatcher {
 
     private let pokemonAPI = PokemonAPI()
 
-    init() {
-    }
+    private var pagedObject: PKMPagedObject<PKMPokemon>?
 
     func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
-        firstPageFromAPI(pageSize: pageSize) { result in
-            switch result {
-            case .success(let remoteList):
-                var pokemons = [Pokemon]()
-                var fulfillmentCount = 0
-                remoteList.pokemons.forEach { [weak self] (pokemon: RemotePokemon) -> () in
-                    guard let self = self else {
+        firstPageFromAPI(pageSize: pageSize) { [weak self] result in
+            guard let self = self else {
+                return
+            }
+            self.managePage(result: result) { pokemonResult in
+                switch pokemonResult {
+                case .success(let pokemons):
+                    guard let totalCount = try? result.get().totalCount else {
+                        DispatchQueue.main.async {
+                            completion(Result.failure(RemoteError.firstPokemons))
+                        }
                         return
                     }
-                    guard let imageURL = pokemon.imageURL, let url = URL(string: imageURL) else {
-                        return
+                    let list = PokemonList(totalPokemonCount: totalCount, pokemons: pokemons)
+                    DispatchQueue.main.async {
+                        completion(Result.success(list))
                     }
-                    self.downloadData(from: url) { data in
-                        fulfillmentCount += 1
-                        guard let data = data else {
-                            return
-                        }
-                        guard let pkm = self.convert(pokemon, data: data) else {
-                            return
-                        }
-
-                        pokemons.append(pkm)
-
-                        if fulfillmentCount == remoteList.pokemons.count, let count = remoteList.totalPokemonCount {
-                            guard !pokemons.isEmpty else {
-                                DispatchQueue.main.async {
-                                    completion(Result.failure(RemoteError.firstPokemons))
-                                }
-                                return
-                            }
-                            let list = PokemonList(totalPokemonCount: count, pokemons: pokemons)
-                            DispatchQueue.main.async {
-                                completion(Result.success(list))
-                            }
-                        }
+                case .failure:
+                    DispatchQueue.main.async {
+                        completion(Result.failure(RemoteError.firstPokemons))
                     }
-                }
-            case .failure:
-                DispatchQueue.main.async {
-                    completion(Result.failure(RemoteError.firstPokemons))
                 }
             }
         }
     }
 
-    private func firstPageFromAPI(pageSize: Int, completion: @escaping (Result<RemotePokemonList, Error>) -> Void) {
+    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+        pageFromAPI(pageNumber: number) { [weak self] result in
+            guard let self = self else {
+                return
+            }
+            self.managePage(result: result) { pokemonResult in
+                switch pokemonResult {
+                case .success(let pokemons):
+                    DispatchQueue.main.async {
+                        completion(Result.success(pokemons))
+                    }
+                case .failure:
+                    DispatchQueue.main.async {
+                        completion(Result.failure(RemoteError.nextPagePokemons))
+                    }
+                }
+            }
+        }
+    }
+
+    private func managePage(result: Result<(totalCount: Int, list: [RemotePokemon]), Error>, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+        switch result {
+        case .success(let value):
+            var pokemons = [Pokemon]()
+            var fulfillmentCount = 0
+            value.list.forEach { [weak self] (pokemon: RemotePokemon) -> () in
+                guard let self = self else {
+                    return
+                }
+                guard let imageURL = pokemon.imageURL, let url = URL(string: imageURL) else {
+                    return
+                }
+                self.downloadData(from: url) { data in
+                    fulfillmentCount += 1
+                    guard let data = data else {
+                        return
+                    }
+                    guard let pkm = self.convert(pokemon, data: data) else {
+                        return
+                    }
+
+                    pokemons.append(pkm)
+
+                    if fulfillmentCount == value.list.count {
+                        guard !pokemons.isEmpty else {
+                            completion(Result.failure(RemoteError.emptyPokemons))
+                            return
+                        }
+                        completion(Result.success(pokemons))
+
+                    }
+                }
+            }
+        case .failure(let error):
+            completion(Result.failure(error))
+        }
+    }
+
+    private func firstPageFromAPI(pageSize: Int, completion: @escaping PageCompletion) {
         let state = PaginationState<PKMPokemon>.initial(pageLimit: pageSize)
-        pokemonAPI.pokemonService.fetchPokemonList(paginationState: state) { [weak self] (result: Result<PKMPagedObject<PKMPokemon>, Error>) in
+        fetchPokemonList(paginationState: state, withEventualError: .firstPokemons, completion: completion)
+    }
+
+    private func pageFromAPI(pageNumber: Int, completion: @escaping PageCompletion) {
+        guard let page = pagedObject else {
+            completion(Result.failure(RemoteError.nextPagePokemons))
+            return
+        }
+        let state = PaginationState<PKMPokemon>.continuing(page, .page(pageNumber))
+        fetchPokemonList(paginationState: state, withEventualError: .nextPagePokemons, completion: completion)
+    }
+
+    private func fetchPokemonList(paginationState: PaginationState<PKMPokemon>, withEventualError error: RemoteError, completion: @escaping PageCompletion) {
+        pokemonAPI.pokemonService.fetchPokemonList(paginationState: paginationState) { [weak self] (result: Result<PKMPagedObject<PKMPokemon>, Error>) in
             guard let self = self else {
                 return
             }
             switch result {
             case .success(let page):
                 guard let totalCount = page.count else {
-                    completion(Result.failure(RemoteError.firstPokemons))
+                    completion(Result.failure(error))
                     return
                 }
 
                 guard let resources = page.results as? [PKMNamedAPIResource<PKMPokemon>] else {
-                    completion(Result.failure(RemoteError.firstPokemons))
+                    completion(Result.failure(error))
                     return
+                }
+
+                if let storedCurrentPage = self.pagedObject?.currentPage {
+                    if storedCurrentPage < page.currentPage {
+                        self.pagedObject = page
+                    }
+                } else {
+                    self.pagedObject = page
                 }
 
                 var pokemons = [RemotePokemon]()
@@ -106,8 +169,7 @@ class RemotePokemonCatcher: PokemonCatcher {
                         }
 
                         if fulfilledResourceCount == resources.count {
-                            let list = RemotePokemonList(totalPokemonCount: totalCount, pokemons: pokemons)
-                            completion(Result.success(list))
+                            completion(Result.success((totalCount, pokemons)))
                         }
                     }
                 }
@@ -116,6 +178,7 @@ class RemotePokemonCatcher: PokemonCatcher {
             }
         }
     }
+
 
     private func convert(_ resource: PKMPokemon) -> RemotePokemon {
         RemotePokemon(id: resource.id, name: resource.name, imageURL: resource.sprites?.frontDefault)
@@ -137,10 +200,6 @@ class RemotePokemonCatcher: PokemonCatcher {
         }
 
         task.resume()
-    }
-
-    func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
-
     }
 
     func taskOngoingFor(for index: Int) -> Bool {
