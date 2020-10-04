@@ -87,6 +87,34 @@ class CollectionViewModelTests: XCTestCase {
         XCTAssertNil(item, "Item must be nil")
     }
 
+    func testDoesntGetsMorePokemonIfThereIsATaskOngoingForTheIndex() {
+        let index = 3
+        let mock = PokemonCatcherMock(taskOngoingForIndex: index)
+        let sut = makeSUT(catcher: mock)
+
+        sut.getMorePokemonsIfNeeded(at: [IndexPath(item: index, section: 0)])
+        XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, index, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
+    }
+
+    func testDoesntGetsMorePokemonIfTheDataIsAlreadyCatch() throws {
+        let id = 8
+        let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
+        let pokemon = Pokemon(id: id, name: "foo", imageData: imageData)
+        let list = PokemonList(totalPokemonCount: 10, pokemons: [pokemon])
+        let mock = PokemonCatcherMock(pokemonList: list)
+        let sut = makeSUT(catcher: mock)
+
+        sut.getPokemons { result in  }
+        mock.simulateFirstOnSuccess()
+
+        sut.getMorePokemonsIfNeeded(at: [IndexPath(item: id, section: 0)])
+        XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, id, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
+    }
+
     //MARK: Helpers
 
     private func makeSUT(catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
@@ -98,15 +126,29 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
 
     let pokemonList: PokemonList?
     let error: Error?
+    let taskOngoingForIndex: Int?
 
     init(pokemonList: PokemonList){
         self.pokemonList = pokemonList
         self.error = nil
+        self.taskOngoingForIndex = nil
     }
 
     init(error: Error) {
         self.pokemonList = nil
         self.error = error
+        self.taskOngoingForIndex = nil
+    }
+
+    init(taskOngoingForIndex: Int) {
+        self.pokemonList = nil
+        self.error = nil
+        self.taskOngoingForIndex = taskOngoingForIndex
+    }
+
+    override func taskOngoingFor(for index: Int) -> Bool {
+        let _ = super.taskOngoingFor(for: index)
+        return taskOngoingForIndex == index
     }
 
     func simulateFirstOnSuccess() {

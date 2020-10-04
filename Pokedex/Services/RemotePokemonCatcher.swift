@@ -142,7 +142,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         task.resume()
     }
 
-    func next() {
+    func pageThatContains(indexes: [Int]) {
 
     }
 

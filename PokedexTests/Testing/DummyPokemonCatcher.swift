@@ -10,7 +10,7 @@
 class DummyPokemonCatcher: PokemonCatcher {
     func firstPage(completion: @escaping (Result<PokemonList, Error>) -> Void) {}
 
-    func next() {}
+    func pageThatContains(indexes: [Int]) {}
 
     func taskOngoingFor(for index: Int) -> Bool {
         false

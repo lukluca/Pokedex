@@ -56,18 +56,19 @@ class CollectionViewModel {
         cellViewModels.append(contentsOf: items)
     }
 
-
     func getMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
-//        let atLeastOneTaskNotOngoing = indexPaths.map { path -> Bool in
-//            catcher.taskOngoingFor(for: path.item)
-//        }.first { !$0 }
-//
-//        indexPaths.map { path -> Bool in
-//            cellViewModels
-//            cellViewModels[path.item] != nil
-//        }
+        let indexPathsWithoutATask = indexPaths.filter { path -> Bool in
+            !catcher.taskOngoingFor(for: path.item)
+        }
 
-        //or the task for the given indexes are ongoing or we have already the data
+        let indexPathsWithoutAnItem = indexPaths.filter { path -> Bool in
+            item(at: path) == nil
+        }
+
+        if !indexPathsWithoutATask.isEmpty && !indexPathsWithoutAnItem.isEmpty {
+            let indexes = Array(Set(indexPathsWithoutATask + indexPathsWithoutAnItem)).map { $0.item }.sorted()
+            catcher.pageThatContains(indexes: indexes)
+        }
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
