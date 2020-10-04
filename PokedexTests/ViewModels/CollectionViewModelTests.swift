@@ -151,14 +151,13 @@ class CollectionViewModelTests: XCTestCase {
         sut.getMorePokemonsIfNeeded(for: [IndexPath(item: 7, section: 0)]) { newItems in
             XCTAssertEqual(newItems.count, 1)
             XCTAssertEqual(newItems.first, IndexPath(item: 11, section: 0))
+            XCTAssertNotNil(sut.item(at: IndexPath(item: 11, section: 0)), "Missing append new cell view models")
             expectation.fulfill()
         }
 
         mock.simulateNextPageOnSuccess()
 
-        wait(for:
-
-        [expectation], timeout: 0)
+        wait(for: [expectation], timeout: 0)
     }
 
     func testGetsMorePokemonCompletingWithFailure() throws {

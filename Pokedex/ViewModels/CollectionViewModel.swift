@@ -93,6 +93,7 @@ class CollectionViewModel {
             }
             switch result {
             case .success(let pokemons):
+                self.append(pokemons.compactMap {self.convert($0)})
                 let newIndexes = pokemons.map { pokemon -> IndexPath in
                     let item = self.convertIntoIndex(id: pokemon.id)
                     return IndexPath(item: item, section: 0)
