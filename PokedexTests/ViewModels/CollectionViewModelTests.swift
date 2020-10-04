@@ -27,7 +27,7 @@ class CollectionViewModelTests: XCTestCase {
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
-        let pokemon = try makeAPokemon(with: 0)
+        let pokemon = try makeAPokemon(withId: 1)
         let list = makeAPokemonList(withTotalPokemonCount: 100, andOnlyOnePokemon: pokemon)
         let mock = PokemonCatcherMock(pokemonList: list)
         let sut = makeSUT(catcher: mock)
@@ -107,27 +107,28 @@ class CollectionViewModelTests: XCTestCase {
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: id, section: 0)]) { result in }
+        let item = (id - 1)
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { result in }
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.taskOngoingForInvocations.first, id, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageThatContainsInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
     }
 
     func testGetsMorePokemonIfTheDataIsNotAlreadyCatched() throws {
-        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 8)
+        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 9)
         let mock = PokemonCatcherMock(pokemonList: list)
         let sut = makeSUT(catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        let itemIndex = 7
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: itemIndex, section: 0)]) { result in }
+        let item = 7
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { result in }
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.taskOngoingForInvocations.first, itemIndex, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageThatContainsInvocations.count, 1, "Missing load of the required page")
-        XCTAssertEqual(mock.pageThatContainsInvocations.first?.indexes.first, itemIndex, "Missing load of the required page")
+        XCTAssertEqual(mock.pageThatContainsInvocations.first?.indexes.first, item, "Missing load of the required page")
     }
 
     func testGetsMorePokemonCompletingWithSuccess() throws {
@@ -151,7 +152,7 @@ class CollectionViewModelTests: XCTestCase {
     }
 
     private func makeAPokemonList(withTotalPokemonCount count: Int, andOnlyOnePokemonWithId id: Int) throws -> PokemonList {
-        let pokemon = try makeAPokemon(with: id)
+        let pokemon = try makeAPokemon(withId: id)
         return makeAPokemonList(withTotalPokemonCount: count, andOnlyOnePokemon: pokemon)
     }
 
@@ -159,7 +160,7 @@ class CollectionViewModelTests: XCTestCase {
         PokemonList(totalPokemonCount: count, pokemons: [pokemon])
     }
 
-    private func makeAPokemon(with id: Int) throws -> Pokemon {
+    private func makeAPokemon(withId id: Int) throws -> Pokemon {
         let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
         return Pokemon(id: id, name: "foo", imageData: imageData)
     }

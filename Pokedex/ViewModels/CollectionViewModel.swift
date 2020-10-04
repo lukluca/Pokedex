@@ -26,7 +26,7 @@ class CollectionViewModel {
 
     func item(at indexPath: IndexPath) -> CellViewModel? {
         cellViewModels.first { (model: CellViewModel) -> Bool in
-            model.id == indexPath.row
+            (model.id - 1) == indexPath.row
         }
     }
 
