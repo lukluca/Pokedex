@@ -27,7 +27,7 @@ class CollectionViewModelTests: XCTestCase {
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
-        let pokemon = try makeAPokemon(withId: 1, name: "foo")
+        let pokemon = try makeAPokemon(withId: 0, name: "foo")
         let list = makeAPokemonList(withTotalPokemonCount: 100, andOnlyOnePokemon: pokemon)
         let mock = PokemonCatcherMock(pokemonList: list)
         let sut = makeSUT(catcher: mock)
@@ -37,6 +37,7 @@ class CollectionViewModelTests: XCTestCase {
             case .success:
                 XCTAssertEqual(sut.numberOfItems(in: 0), 100, "numberOfItems must be equal to totalPokemonCount")
                 let item = sut.item(at: IndexPath(item: 0, section: 0))
+                XCTAssertNotNil(item, "Item must be not nil if pokemon is present inside data source")
                 XCTAssertEqual(item?.text, "Foo", "Failure while converting pokemon")
                 XCTAssertEqual(item?.image.pngData(), UIImage(data: pokemon.imageData)?.pngData(), "Failure while converting pokemon")
                 let nilItem = sut.item(at: IndexPath(item: 1, section: 0))
@@ -106,7 +107,7 @@ class CollectionViewModelTests: XCTestCase {
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: (id - 1), section: 0)]) { newItems in
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: id, section: 0)]) { newItems in
             XCTAssertTrue(newItems.isEmpty)
             expectation.fulfill()
         }
@@ -148,8 +149,8 @@ class CollectionViewModelTests: XCTestCase {
 
         sut.getMorePokemonsIfNeeded(for: [IndexPath(item: 7, section: 0)]) { newItems in
             XCTAssertEqual(newItems.count, 1)
-            XCTAssertEqual(newItems.first, IndexPath(item: 11, section: 0))
-            XCTAssertNotNil(sut.item(at: IndexPath(item: 11, section: 0)), "Missing append new cell view models")
+            XCTAssertEqual(newItems.first, IndexPath(item: 12, section: 0))
+            XCTAssertNotNil(sut.item(at: IndexPath(item: 12, section: 0)), "Missing append new cell view models")
             expectation.fulfill()
         }
 

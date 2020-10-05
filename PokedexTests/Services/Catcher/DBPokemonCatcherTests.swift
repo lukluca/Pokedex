@@ -46,7 +46,7 @@ class DBPokemonCatcherTests: RealmTestCase {
                 XCTAssertEqual(list.totalPokemonCount, 1)
                 let pokemons = list.pokemons
                 XCTAssertEqual(pokemons.count, 1)
-                XCTAssertEqual(pokemons.first?.id, 1)
+                XCTAssertEqual(pokemons.first?.id, 0)
                 XCTAssertEqual(pokemons.first?.name, "foo_0")
                 expect.fulfill()
             case .failure: ()
@@ -72,9 +72,9 @@ class DBPokemonCatcherTests: RealmTestCase {
                 let sorted = pokemons.sorted { (pokemon: Pokemon, pokemon2: Pokemon) -> Bool in
                     pokemon.id < pokemon2.id
                 }
-                XCTAssertEqual(sorted.first?.id, 1)
+                XCTAssertEqual(sorted.first?.id, 0)
                 XCTAssertEqual(sorted.first?.name, "foo_0")
-                XCTAssertEqual(sorted.last?.id, 10)
+                XCTAssertEqual(sorted.last?.id, 9)
                 XCTAssertEqual(sorted.last?.name, "foo_9")
                 expect.fulfill()
             case .failure: ()
@@ -124,9 +124,9 @@ class DBPokemonCatcherTests: RealmTestCase {
                 let sorted = pokemons.sorted { (pokemon: Pokemon, pokemon2: Pokemon) -> Bool in
                     pokemon.id < pokemon2.id
                 }
-                XCTAssertEqual(sorted.first?.id, 51)
+                XCTAssertEqual(sorted.first?.id, 50)
                 XCTAssertEqual(sorted.first?.name, "foo_50")
-                XCTAssertEqual(sorted.last?.id, 100)
+                XCTAssertEqual(sorted.last?.id, 99)
                 XCTAssertEqual(sorted.last?.name, "foo_99")
                 expect.fulfill()
             case .failure: ()
@@ -168,7 +168,7 @@ class DBPokemonCatcherTests: RealmTestCase {
 
             let entity = DBPokemon()
             entity.name = "foo_\(id)"
-            entity.id = id + 1
+            entity.id = id
             entity.imageData = try UIImage.imageResourceAsData(insideBundleOf: DBPokemon.self)
             return entity
         }

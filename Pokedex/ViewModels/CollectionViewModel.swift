@@ -27,7 +27,7 @@ class CollectionViewModel {
 
     func item(at indexPath: IndexPath) -> CellViewModel? {
         cellViewModels.first { (model: CellViewModel) -> Bool in
-            convertIntoIndex(id: model.id) == indexPath.row
+            model.id == indexPath.row
         }
     }
 
@@ -63,10 +63,9 @@ class CollectionViewModel {
     }
 
     func getMorePokemonsIfNeeded(for indexPaths: [IndexPath], completion: @escaping ([IndexPath]) -> Void) {
-        let pagesFromIndexPaths = indexPaths.map { (i: IndexPath) -> Int in
-            Int(floor(Double(i.item) / Double(pageSize)))
-        }
-        let uniquePageNumbers = Array(Set(pagesFromIndexPaths)).sorted()
+        let pagesFromIndexPaths = pagesFrom(indexPaths: indexPaths)
+
+        let uniquePageNumbers = Set(pagesFromIndexPaths)
 
         let pagesWithoutATask = uniquePageNumbers.filter { page -> Bool in
             !catcher.taskOngoingFor(for: page)
@@ -76,9 +75,7 @@ class CollectionViewModel {
             item(at: path) == nil
         }
 
-        let pagesWithoutAnItem = indexPathsWithoutAnItem.map { (i: IndexPath) -> Int in
-            Int(floor(Double(i.item) / Double(pageSize)))
-        }
+        let pagesWithoutAnItem = pagesFrom(indexPaths: indexPathsWithoutAnItem)
 
         if !pagesWithoutATask.isEmpty && !pagesWithoutAnItem.isEmpty {
             let pages = Array(Set(pagesWithoutATask + pagesWithoutAnItem)).sorted()
@@ -90,10 +87,6 @@ class CollectionViewModel {
         }
     }
 
-    private func convertIntoIndex(id: Int) -> Int {
-        id - 1
-    }
-
     private func getPage(number: Int, completion: @escaping ([IndexPath]) -> Void) {
         catcher.page(pageSize: pageSize, number: number) { [weak self] result in
             guard let self = self else {
@@ -103,14 +96,21 @@ class CollectionViewModel {
             case .success(let pokemons):
                 self.append(pokemons)
                 let newIndexes = pokemons.map { pokemon -> IndexPath in
-                    let item = self.convertIntoIndex(id: pokemon.id)
-                    return IndexPath(item: item, section: 0)
+                    IndexPath(item: pokemon.id, section: 0)
                 }
                 completion(newIndexes)
             case .failure:
                 completion([])
             }
         }
+    }
+
+    private func pagesFrom(indexPaths: [IndexPath]) -> [Int] {
+        indexPaths.map { pageNumber(for: $0.item) }
+    }
+
+    private func pageNumber(for item: Int) -> Int {
+        Int(floor(Double(item) / Double(pageSize)))
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {

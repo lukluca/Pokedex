@@ -78,7 +78,7 @@ class DBPokemonCatcher: PokemonCatcher {
 
     private func read(pageSize: Int, number: Int, from entities: Results<DBPokemon>) -> [DBPokemon] {
         let entitiesInsidePage = entities.filter { (pokemon: DBPokemon) -> Bool in
-            pokemon.id > (number * pageSize) && pokemon.id <= ((number + 1) * pageSize)
+            pokemon.id >= (number * pageSize) && pokemon.id < ((number + 1) * pageSize)
         }
 
         return Array(entitiesInsidePage)

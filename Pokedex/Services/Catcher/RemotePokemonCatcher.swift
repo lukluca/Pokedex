@@ -192,7 +192,13 @@ class RemotePokemonCatcher: PokemonCatcher {
     }
 
     private func convert(_ resource: PKMPokemon) -> RemotePokemon {
-        RemotePokemon(id: resource.id, name: resource.name, imageURL: resource.sprites?.frontDefault)
+        let arrayId: Int?
+        if let id = resource.id {
+            arrayId = id - 1
+        } else {
+            arrayId = nil
+        }
+        return RemotePokemon(id: arrayId, name: resource.name, imageURL: resource.sprites?.frontDefault)
     }
 
     private func convert(_ resource: RemotePokemon, data: Data?) -> Pokemon? {
