@@ -39,7 +39,7 @@ class CollectionViewModel {
             switch result {
             case .success(let list):
                 self.totalNumberOfItems = list.totalPokemonCount
-                self.append(list.pokemons.compactMap {self.convert($0)})
+                self.append(list.pokemons)
                 completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
@@ -52,6 +52,10 @@ class CollectionViewModel {
             return nil
         }
         return CellViewModel(id: pokemon.id, text: pokemon.name.firstUppercase, image: image)
+    }
+
+    private func append(_ pokemons: [Pokemon]) {
+        append(pokemons.compactMap {self.convert($0)})
     }
 
     private func append(_ items: [CellViewModel]) {
@@ -93,7 +97,7 @@ class CollectionViewModel {
             }
             switch result {
             case .success(let pokemons):
-                self.append(pokemons.compactMap {self.convert($0)})
+                self.append(pokemons)
                 let newIndexes = pokemons.map { pokemon -> IndexPath in
                     let item = self.convertIntoIndex(id: pokemon.id)
                     return IndexPath(item: item, section: 0)
