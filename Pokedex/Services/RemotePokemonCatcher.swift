@@ -13,6 +13,7 @@ enum RemoteError: Error {
     case firstPokemons
     case nextPagePokemons
     case emptyPokemons
+    case alreadyWorkingOnPage
 }
 
 struct RemotePokemon {
@@ -21,16 +22,13 @@ struct RemotePokemon {
     let imageURL: String?
 }
 
-//struct RemotePokemonList {
-  //  let totalPokemonCount: Int?
-  //  let pokemons: [RemotePokemon]
-//}
-
 class RemotePokemonCatcher: PokemonCatcher {
 
     private let pokemonAPI = PokemonAPI()
 
     private var pagedObject: PKMPagedObject<PKMPokemon>?
+
+    private var pagesOnDownload = Set<Int>()
 
     func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
         firstPageFromAPI(pageSize: pageSize) { [weak self] result in
@@ -60,11 +58,17 @@ class RemotePokemonCatcher: PokemonCatcher {
     }
 
     func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
+        guard !pagesOnDownload.contains(number) else {
+            completion(Result.failure(RemoteError.alreadyWorkingOnPage))
+            return
+        }
+        pagesOnDownload.insert(number)
         pageFromAPI(pageNumber: number) { [weak self] result in
             guard let self = self else {
                 return
             }
             self.managePage(result: result) { pokemonResult in
+                self.pagesOnDownload.remove(number)
                 switch pokemonResult {
                 case .success(let pokemons):
                     DispatchQueue.main.async {
@@ -178,7 +182,6 @@ class RemotePokemonCatcher: PokemonCatcher {
             }
         }
     }
-
 
     private func convert(_ resource: PKMPokemon) -> RemotePokemon {
         RemotePokemon(id: resource.id, name: resource.name, imageURL: resource.sprites?.frontDefault)
