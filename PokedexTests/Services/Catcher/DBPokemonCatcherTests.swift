@@ -10,13 +10,7 @@ import XCTest
 import RealmSwift
 @testable import Pokedex
 
-class DBPokemonCatcherTests: XCTestCase {
-
-    override func setUp() {
-        super.setUp()
-
-        Realm.Configuration.defaultConfiguration.inMemoryIdentifier = self.name
-    }
+class DBPokemonCatcherTests: RealmTestCase {
 
     func testIfThereAreNoPokemonsCallsNextHandler() {
         let spy = PokemonCatcherSpy()
