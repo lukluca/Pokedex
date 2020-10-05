@@ -220,8 +220,6 @@ class RemotePokemonCatcher: PokemonCatcher {
     }
 
     func taskOngoingFor(for index: Int) -> Bool {
-        print(index)
-        print(pagesOnDownload)
-        return pagesOnDownload.contains(index)
+        pagesOnDownload.contains(index)
     }
 }
