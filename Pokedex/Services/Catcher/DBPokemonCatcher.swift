@@ -6,34 +6,12 @@
 //
 
 import RealmSwift
-import UIKit
 
 enum DBError: Error {
     case firstPokemons
     case nextPagePokemons
 }
 
-//MARK: Realm Objects
-
-class DBPokemon: Object {
-    @objc dynamic var id = 0
-    @objc dynamic var name = ""
-    @objc dynamic var imageData = Data()
-
-    override static func primaryKey() -> String? {
-        "id"
-    }
-}
-
-class DBPokedex: Object {
-    @objc dynamic var totalPokemonCount = 0
-}
-
-class DBPokemonList: Object {
-    dynamic var pokemons = List<DBPokemon>()
-}
-
-//MARK: DBPokemonCatcher
 class DBPokemonCatcher: PokemonCatcher {
 
     private let nextHandler: PokemonCatcher

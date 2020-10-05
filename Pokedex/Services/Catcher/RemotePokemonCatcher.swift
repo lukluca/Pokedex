@@ -25,10 +25,15 @@ struct RemotePokemon {
 class RemotePokemonCatcher: PokemonCatcher {
 
     private let pokemonAPI = PokemonAPI()
+    private let nextHandler: DBPokemonSaver
 
     private var pagedObject: PKMPagedObject<PKMPokemon>?
 
     private var pagesOnDownload = Set<Int>()
+
+    init(nextHandler: DBPokemonSaver) {
+        self.nextHandler = nextHandler
+    }
 
     func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void) {
         firstPageFromAPI(pageSize: pageSize) { [weak self] result in
@@ -44,6 +49,8 @@ class RemotePokemonCatcher: PokemonCatcher {
                         }
                         return
                     }
+                    self.nextHandler.save(totalPokemonCount: totalCount)
+                    self.nextHandler.save(pokemons: pokemons)
                     let list = PokemonList(totalPokemonCount: totalCount, pokemons: pokemons)
                     DispatchQueue.main.async {
                         completion(Result.success(list))
@@ -71,6 +78,7 @@ class RemotePokemonCatcher: PokemonCatcher {
                 self.pagesOnDownload.remove(number)
                 switch pokemonResult {
                 case .success(let pokemons):
+                    self.nextHandler.save(pokemons: pokemons)
                     DispatchQueue.main.async {
                         completion(Result.success(pokemons))
                     }
