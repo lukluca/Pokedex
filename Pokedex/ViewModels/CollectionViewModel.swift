@@ -63,22 +63,26 @@ class CollectionViewModel {
     }
 
     func getMorePokemonsIfNeeded(for indexPaths: [IndexPath], completion: @escaping ([IndexPath]) -> Void) {
-        let indexPathsWithoutATask = indexPaths.filter { path -> Bool in
-            !catcher.taskOngoingFor(for: path.item)
+        let pagesFromIndexPaths = indexPaths.map { (i: IndexPath) -> Int in
+            Int(floor(Double(i.item) / Double(pageSize)))
+        }
+        let uniquePageNumbers = Array(Set(pagesFromIndexPaths)).sorted()
+
+        let pagesWithoutATask = uniquePageNumbers.filter { page -> Bool in
+            !catcher.taskOngoingFor(for: page)
         }
 
         let indexPathsWithoutAnItem = indexPaths.filter { path -> Bool in
             item(at: path) == nil
         }
 
-        if !indexPathsWithoutATask.isEmpty && !indexPathsWithoutAnItem.isEmpty {
-            let indexes = Array(Set(indexPathsWithoutATask + indexPathsWithoutAnItem)).map { $0.item }.sorted()
-            let pages = indexes.map { (i: Int) -> Int in
-              Int(floor(Double(i) / Double(pageSize)))
-            }
-            let uniqueSortedPageNumbers = Array(Set(pages)).sorted()
+        let pagesWithoutAnItem = indexPathsWithoutAnItem.map { (i: IndexPath) -> Int in
+            Int(floor(Double(i.item) / Double(pageSize)))
+        }
 
-            uniqueSortedPageNumbers.forEach { (pageNumber: Int) in
+        if !pagesWithoutATask.isEmpty && !pagesWithoutAnItem.isEmpty {
+            let pages = Array(Set(pagesWithoutATask + pagesWithoutAnItem)).sorted()
+            pages.forEach { (pageNumber: Int) in
                 getPage(number: pageNumber, completion: completion)
             }
         } else {

@@ -30,38 +30,35 @@ class DBPokemonSaverTests: RealmTestCase {
 
         sut.save(pokemons: [pokemon])
 
-        let pokemonList = try readPokemonsList()
+        let entities = try readPokemons()
 
-        XCTAssertNotNil(pokemonList)
-        XCTAssertEqual(pokemonList?.pokemons.count, 1)
-        XCTAssertEqual(pokemonList?.pokemons.first?.id, 10)
-        XCTAssertEqual(pokemonList?.pokemons.first?.name, "foo")
-        XCTAssertEqual(pokemonList?.pokemons.first?.imageData, Data())
+        XCTAssertNotNil(entities)
+        XCTAssertEqual(entities?.count, 1)
+        XCTAssertEqual(entities?.first?.id, 10)
+        XCTAssertEqual(entities?.first?.name, "foo")
+        XCTAssertEqual(entities?.first?.imageData, Data())
     }
 
     //MARK: Helpers
 
     private func makeSUT() -> DBPokemonSaver {
-        DBPokemonSaver()
+        DBPokemonSaver(db: try? makeDatabase())
     }
 
     private func readPokedex() throws -> DBPokedex? {
         try readFromDatabase(DBPokedex.self)
     }
 
-    private func readPokemonsList() throws -> DBPokemonList? {
-        try readFromDatabase(DBPokemonList.self)
+    private func readPokemons() throws -> Results<DBPokemon>? {
+        try readFromDatabase(DBPokemon.self)
     }
 
     private func readFromDatabase<Element: Object>(_ type: Element.Type) throws -> Element? {
         try makeDatabase().objects(type.self).first
     }
 
-    private func makeList(ofSize size: Int) throws -> DBPokemonList {
-        let pokemons = try makeEntities(count:size)
-        let list = DBPokemonList()
-        list.pokemons = pokemons
-        return list
+    private func readFromDatabase<Element: Object>(_ type: Element.Type) throws -> Results<Element>? {
+        try makeDatabase().objects(type.self)
     }
 
     private func makePokedex(with total: Int) throws -> DBPokedex {
@@ -72,7 +69,6 @@ class DBPokemonSaverTests: RealmTestCase {
 
     private func makeEntities(count: Int) throws -> List<DBPokemon> {
         let array = try (0 ..< count).compactMap { id -> DBPokemon? in
-
             let entity = DBPokemon()
             entity.name = "foo_\(id)"
             entity.id = id

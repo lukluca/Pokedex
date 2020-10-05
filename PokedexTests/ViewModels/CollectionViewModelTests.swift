@@ -101,19 +101,18 @@ class CollectionViewModelTests: XCTestCase {
         let id = 8
         let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: id)
         let mock = PokemonCatcherMock(pokemonList: list)
-        let sut = makeSUT(catcher: mock)
+        let sut = makeSUT(pageSize: 10, catcher: mock)
 
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        let item = (id - 1)
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { newItems in
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: (id - 1), section: 0)]) { newItems in
             XCTAssertTrue(newItems.isEmpty)
             expectation.fulfill()
         }
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, 0, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageInvocations.count, 0, "If the task is ongoing for the index, you don't have to load the page")
 
         wait(for: [expectation], timeout: 0)
@@ -128,11 +127,10 @@ class CollectionViewModelTests: XCTestCase {
         sut.getPokemons { result in  }
         mock.simulateFirstPageOnSuccess()
 
-        let item = 57
-        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: item, section: 0)]) { _ in}
+        sut.getMorePokemonsIfNeeded(for: [IndexPath(item: 57, section: 0)]) { _ in}
 
         XCTAssertEqual(mock.taskOngoingForInvocations.count, 1, "Missing ask the catcher if there is a task ongoing")
-        XCTAssertEqual(mock.taskOngoingForInvocations.first, item, "Missing ask the catcher if there is a task ongoing")
+        XCTAssertEqual(mock.taskOngoingForInvocations.first, 1, "Missing ask the catcher if there is a task ongoing")
         XCTAssertEqual(mock.pageInvocations.count, 1, "Missing load of the required page")
         XCTAssertEqual(mock.pageInvocations.first?.number, 1, "Missing load of the required page")
         XCTAssertEqual(mock.pageInvocations.first?.pageSize, pageSize, "Missing load of the required page")
@@ -181,7 +179,7 @@ class CollectionViewModelTests: XCTestCase {
 
     //MARK: Helpers
 
-    private func makeSUT(pageSize: Int = 0, catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
+    private func makeSUT(pageSize: Int = 1, catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
         CollectionViewModel(pageSize: pageSize, catcher: catcher)
     }
 

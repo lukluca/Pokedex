@@ -9,23 +9,27 @@ import RealmSwift
 
 class DBPokemonSaver {
 
-    private var database: Realm? {
-        try? Realm()
+    private let db: Realm?
+
+    init(db: Realm?) {
+        self.db = db
     }
 
     func save(totalPokemonCount: Int) {
+        save(inside: db, totalPokemonCount: totalPokemonCount)
+    }
+
+    private func save(inside database: Realm?, totalPokemonCount: Int) {
         let pokedex = DBPokedex()
         pokedex.totalPokemonCount = totalPokemonCount
-        try? writeInsideDatabase(object: pokedex)
+        try? writeInside(database: database, object: pokedex)
     }
 
     func save(pokemons: [Pokemon]) {
-        let list: DBPokemonList
-        if let oldList = readPokemonsList() {
-            list = oldList
-        } else {
-            list = DBPokemonList()
-        }
+        save(inside: db, pokemons: pokemons)
+    }
+
+    private func save(inside database: Realm?, pokemons: [Pokemon]) {
         let dbPokemons = pokemons.map { pokemon -> DBPokemon in
             let pkm = DBPokemon()
             pkm.id = pokemon.id
@@ -33,17 +37,16 @@ class DBPokemonSaver {
             pkm.imageData = pokemon.imageData
             return pkm
         }
-        list.pokemons.append(objectsIn: dbPokemons)
-        try? writeInsideDatabase(object: list)
+        try? writeInside(database: database, objects: dbPokemons)
     }
 
-    private func writeInsideDatabase(object: Object) throws {
+    private func writeInside(database: Realm?, object: Object) throws {
+       try writeInside(database: database, objects: [object])
+    }
+
+    private func writeInside(database: Realm?, objects: [Object]) throws {
         try database?.write {
-            database?.add(object)
+            database?.add(objects)
         }
-    }
-
-    private func readPokemonsList() -> DBPokemonList? {
-        database?.objects(DBPokemonList.self).first
     }
 }

@@ -24,7 +24,3 @@ class DBPokemon: Object {
 class DBPokedex: Object {
     @objc dynamic var totalPokemonCount = 0
 }
-
-class DBPokemonList: Object {
-    dynamic var pokemons = List<DBPokemon>()
-}

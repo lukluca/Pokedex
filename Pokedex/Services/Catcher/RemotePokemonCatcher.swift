@@ -49,10 +49,10 @@ class RemotePokemonCatcher: PokemonCatcher {
                         }
                         return
                     }
-                    self.nextHandler.save(totalPokemonCount: totalCount)
-                    self.nextHandler.save(pokemons: pokemons)
-                    let list = PokemonList(totalPokemonCount: totalCount, pokemons: pokemons)
                     DispatchQueue.main.async {
+                        self.nextHandler.save(totalPokemonCount: totalCount)
+                        self.nextHandler.save(pokemons: pokemons)
+                        let list = PokemonList(totalPokemonCount: totalCount, pokemons: pokemons)
                         completion(Result.success(list))
                     }
                 case .failure:
@@ -75,11 +75,10 @@ class RemotePokemonCatcher: PokemonCatcher {
                 return
             }
             self.managePage(result: result) { pokemonResult in
-                self.pagesOnDownload.remove(number)
                 switch pokemonResult {
                 case .success(let pokemons):
-                    self.nextHandler.save(pokemons: pokemons)
                     DispatchQueue.main.async {
+                        self.nextHandler.save(pokemons: pokemons)
                         completion(Result.success(pokemons))
                     }
                 case .failure:
@@ -87,6 +86,7 @@ class RemotePokemonCatcher: PokemonCatcher {
                         completion(Result.failure(RemoteError.nextPagePokemons))
                     }
                 }
+                self.pagesOnDownload.remove(number)
             }
         }
     }
@@ -214,6 +214,8 @@ class RemotePokemonCatcher: PokemonCatcher {
     }
 
     func taskOngoingFor(for index: Int) -> Bool {
-        false
+        print(index)
+        print(pagesOnDownload)
+        return pagesOnDownload.contains(index)
     }
 }
