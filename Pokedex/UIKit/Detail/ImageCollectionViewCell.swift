@@ -26,6 +26,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
     private lazy var imageViewConstraints: [NSLayoutConstraint] = {
         [imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
          imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+         imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
          imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)]
     }()
     private var activatedConstraints = [NSLayoutConstraint]()
