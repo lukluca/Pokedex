@@ -13,11 +13,11 @@ extension XCTestCase {
         OperatingSystemVersion(majorVersion: 13, minorVersion: 0, patchVersion: 0)
     }
 
-    func skipIfVersionAtLeast(_ version: OperatingSystemVersion) throws {
+    func skipIfVersionBelow(_ version: OperatingSystemVersion) throws {
         try XCTSkipUnless(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
     }
 
-    func skipIfVersionBelow(_ version: OperatingSystemVersion) throws {
+    func skipIfVersionAtLeast(_ version: OperatingSystemVersion) throws {
         try XCTSkipIf(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
     }
 }

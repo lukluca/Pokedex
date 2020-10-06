@@ -13,7 +13,7 @@ class DetailViewControllerTests: XCTestCase {
 
     @available(iOS 13.0, *)
     func testBackgroundColorForDarkAwareSystems() throws {
-        try skipIfVersionAtLeast(iOS13)
+        try skipIfVersionBelow(iOS13)
 
         let sut = makeSUT()
 
@@ -21,7 +21,7 @@ class DetailViewControllerTests: XCTestCase {
     }
 
     func testBackgroundColorIsWhite() throws {
-        try skipIfVersionBelow(iOS13)
+        try skipIfVersionAtLeast(iOS13)
 
         let sut = makeSUT()
 
@@ -30,7 +30,7 @@ class DetailViewControllerTests: XCTestCase {
 
     @available(iOS 13.0, *)
     func testDoesNotHaveACloseButton() throws  {
-        try skipIfVersionAtLeast(iOS13)
+        try skipIfVersionBelow(iOS13)
 
         let sut = makeSUT()
 
@@ -38,7 +38,7 @@ class DetailViewControllerTests: XCTestCase {
     }
 
     func testDoesHaveACloseButton() throws  {
-        try skipIfVersionBelow(iOS13)
+        try skipIfVersionAtLeast(iOS13)
 
         let sut = makeSUT()
 

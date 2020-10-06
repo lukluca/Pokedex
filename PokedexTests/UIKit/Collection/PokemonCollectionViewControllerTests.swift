@@ -35,7 +35,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
     @available(iOS 13.0, *)
     func testBackgroundColorForDarkAwareSystems() throws {
-        try skipIfVersionAtLeast(iOS13)
+        try skipIfVersionBelow(iOS13)
 
         let sut = makeSUT()
         
@@ -43,7 +43,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
     }
     
     func testBackgroundColorIsWhite() throws {
-        try skipIfVersionBelow(iOS13)
+        try skipIfVersionAtLeast(iOS13)
 
         let sut = makeSUT()
         
