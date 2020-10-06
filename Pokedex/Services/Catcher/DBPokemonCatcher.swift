@@ -50,7 +50,29 @@ class DBPokemonCatcher: PokemonCatcher {
     }
 
     private func convert(_ entity: DBPokemon) -> Pokemon {
-        Pokemon(id: entity.id, name: entity.name, imageData: entity.imageData)
+        Pokemon(id: entity.id, name: entity.name, sprites: convert(entity.sprites))
+    }
+
+    private func convert(_ entity: DBSprites) -> Sprites {
+        Sprites(frontDefault: convert(entity.frontDefault),
+                frontShiny: convert(entity.frontShiny),
+                frontFemale: convert(entity.frontFemale),
+                frontShinyFemale: convert(entity.frontShinyFemale),
+                backDefault: convert(entity.backDefault),
+                backShiny: convert(entity.backShiny),
+                backFemale: convert(entity.backFemale),
+                backShinyFemale: convert(entity.backShinyFemale))
+    }
+
+    private func convert(_ entity: DBDefaultImage) -> DefaultImage {
+        DefaultImage(data: entity.data)
+    }
+
+    private func convert(_ entity: DBImage?) -> Image? {
+        guard let value = entity?.url, let url = URL(string: value) else {
+            return nil
+        }
+        return Image(data: entity?.data, url: url)
     }
 
     func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {

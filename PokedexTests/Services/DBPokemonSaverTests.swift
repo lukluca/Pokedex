@@ -26,7 +26,10 @@ class DBPokemonSaverTests: RealmTestCase {
     func testSavesPokemons() throws {
         let sut = makeSUT()
 
-        let pokemon = Pokemon(id: 10, name: "foo", imageData: Data())
+        //Todo move inside fixture
+        let img = DefaultImage(data: Data())
+        let sprites = Sprites(frontDefault: img, frontShiny: nil, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
+        let pokemon = Pokemon(id: 10, name: "foo", sprites: sprites)
 
         sut.save(pokemons: [pokemon])
 
@@ -36,7 +39,7 @@ class DBPokemonSaverTests: RealmTestCase {
         XCTAssertEqual(entities?.count, 1)
         XCTAssertEqual(entities?.first?.id, 10)
         XCTAssertEqual(entities?.first?.name, "foo")
-        XCTAssertEqual(entities?.first?.imageData, Data())
+        XCTAssertEqual(entities?.first?.sprites.frontDefault.data, Data())
     }
 
     //MARK: Helpers
@@ -59,25 +62,5 @@ class DBPokemonSaverTests: RealmTestCase {
 
     private func readFromDatabase<Element: Object>(_ type: Element.Type) throws -> Results<Element>? {
         try makeDatabase().objects(type.self)
-    }
-
-    private func makePokedex(with total: Int) throws -> DBPokedex {
-        let pokedex = DBPokedex()
-        pokedex.totalPokemonCount = total
-        return pokedex
-    }
-
-    private func makeEntities(count: Int) throws -> List<DBPokemon> {
-        let array = try (0 ..< count).compactMap { id -> DBPokemon? in
-            let entity = DBPokemon()
-            entity.name = "foo_\(id)"
-            entity.id = id
-            entity.imageData = try UIImage.imageResourceAsData(insideBundleOf: DBPokemon.self)
-            return entity
-        }
-
-        let list = List<DBPokemon>()
-        list.append(objectsIn: array)
-        return list
     }
 }

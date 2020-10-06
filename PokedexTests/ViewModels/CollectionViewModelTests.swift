@@ -39,7 +39,7 @@ class CollectionViewModelTests: XCTestCase {
                 let item = sut.item(at: IndexPath(item: 0, section: 0))
                 XCTAssertNotNil(item, "Item must be not nil if pokemon is present inside data source")
                 XCTAssertEqual(item?.text, "Foo", "Failure while converting pokemon")
-                XCTAssertEqual(item?.image.pngData(), UIImage(data: pokemon.imageData)?.pngData(), "Failure while converting pokemon")
+                XCTAssertEqual(item?.image.pngData(), UIImage(data: pokemon.sprites.frontDefault.data)?.pngData(), "Failure while converting pokemon")
                 let nilItem = sut.item(at: IndexPath(item: 1, section: 0))
                 XCTAssertNil(nilItem, "Item must be nil if pokemon is no present inside data source")
                 expectation.fulfill()
@@ -195,7 +195,10 @@ class CollectionViewModelTests: XCTestCase {
 
     private func makeAPokemon(withId id: Int, name: String = "foo") throws -> Pokemon {
         let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
-        return Pokemon(id: id, name: "foo", imageData: imageData)
+        let img = DefaultImage(data: imageData)
+        //Todo move to fixture
+        let sprites = Sprites(frontDefault: img, frontShiny: nil, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
+        return Pokemon(id: id, name: "foo", sprites: sprites)
     }
 }
 

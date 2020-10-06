@@ -22,7 +22,7 @@ class DBPokemonCatcherTests: RealmTestCase {
     }
 
     func testIfThereArePokemonsDoesNotCallNextHandler() throws {
-        try writeInsideDatabase(pokemons: makeEntities(count: 1))
+        try writeInsideDatabase(pokemon: makeAnEntity())
         try writeInsideDatabase(pokedex: makePokedex(with: 1))
 
         let spy = PokemonCatcherSpy()
@@ -35,7 +35,8 @@ class DBPokemonCatcherTests: RealmTestCase {
 
     func testRetrievesExpectedPokemonStored() throws {
         let expect = expectation(description: "Completion invocation")
-        try writeInsideDatabase(pokemons: makeEntities(count: 1))
+        let data = makeRandomData()
+        try writeInsideDatabase(pokemon: makeAnEntity(with: 0, withSpriteFrontDefaultData: data))
         try writeInsideDatabase(pokedex: makePokedex(with: 1))
 
         let sut = makeSUT()
@@ -48,6 +49,7 @@ class DBPokemonCatcherTests: RealmTestCase {
                 XCTAssertEqual(pokemons.count, 1)
                 XCTAssertEqual(pokemons.first?.id, 0)
                 XCTAssertEqual(pokemons.first?.name, "foo_0")
+                XCTAssertEqual(pokemons.first?.sprites.frontDefault.data, data)
                 expect.fulfill()
             case .failure: ()
             }
@@ -142,6 +144,10 @@ class DBPokemonCatcherTests: RealmTestCase {
         DBPokemonCatcher(db: try? makeDatabase(), nextHandler: nextHandler)
     }
 
+    private func writeInsideDatabase(pokemon: DBPokemon) throws {
+        try writeInsideDatabase(pokemons: [pokemon])
+    }
+
     private func writeInsideDatabase(pokemons: [DBPokemon]) throws {
         try writeInsideDatabase(objects: pokemons)
     }
@@ -163,14 +169,31 @@ class DBPokemonCatcherTests: RealmTestCase {
         return pokedex
     }
 
-    private func makeEntities(count: Int) throws -> [DBPokemon] {
-        try (0 ..< count).compactMap { id -> DBPokemon? in
-
-            let entity = DBPokemon()
-            entity.name = "foo_\(id)"
-            entity.id = id
-            entity.imageData = try UIImage.imageResourceAsData(insideBundleOf: DBPokemon.self)
-            return entity
+    private func makeEntities(count: Int) -> [DBPokemon] {
+        (0 ..< count).compactMap { id -> DBPokemon? in
+            let data = makeRandomData()
+            return makeAnEntity(with: id, withSpriteFrontDefaultData: data)
         }
+    }
+
+    private func makeAnEntity(with id: Int = 0) -> DBPokemon {
+        let entity = DBPokemon()
+        entity.name = "foo_\(id)"
+        entity.id = id
+        entity.sprites.frontDefault.data = makeRandomData()
+        return entity
+    }
+
+    private func makeAnEntity(with id: Int, withSpriteFrontDefaultData data: Data) -> DBPokemon {
+        let entity = DBPokemon()
+        entity.name = "foo_\(id)"
+        entity.id = id
+        entity.sprites.frontDefault.data = data
+        return entity
+    }
+
+    private func makeRandomData() -> Data {
+        let bytes = [UInt32](repeating: 0, count: 20).map { _ in arc4random() }
+        return Data(bytes: bytes, count: 20)
     }
 }

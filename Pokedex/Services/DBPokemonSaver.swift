@@ -31,11 +31,7 @@ class DBPokemonSaver {
 
     private func save(inside database: Realm?, pokemons: [Pokemon]) {
         let dbPokemons = pokemons.map { pokemon -> DBPokemon in
-            let pkm = DBPokemon()
-            pkm.id = pokemon.id
-            pkm.name = pokemon.name
-            pkm.imageData = pokemon.imageData
-            return pkm
+            convert(pokemon)
         }
         try? writeInside(database: database, objects: dbPokemons)
     }
@@ -48,5 +44,42 @@ class DBPokemonSaver {
         try database?.write {
             database?.add(objects)
         }
+    }
+
+    private func convert(_ resource: Pokemon) -> DBPokemon {
+        let pkm = DBPokemon()
+        pkm.id = resource.id
+        pkm.name = resource.name
+        pkm.sprites = convert(resource.sprites)
+        return pkm
+    }
+
+    private func convert(_ resource: Sprites) -> DBSprites {
+        let spr = DBSprites()
+        spr.frontDefault = convert(resource.frontDefault)
+        spr.frontShiny = convert(resource.frontShiny)
+        spr.frontFemale = convert(resource.frontFemale)
+        spr.frontShinyFemale = convert(resource.frontShinyFemale)
+        spr.backDefault = convert(resource.backDefault)
+        spr.backShiny = convert(resource.backShiny)
+        spr.backFemale = convert(resource.backFemale)
+        spr.backShinyFemale = convert(resource.backShinyFemale)
+        return spr
+    }
+
+    private func convert(_ resource: DefaultImage) -> DBDefaultImage {
+        let image = DBDefaultImage()
+        image.data = resource.data
+        return image
+    }
+
+    private func convert(_ resource: Image?) -> DBImage? {
+        guard let res = resource else {
+            return nil
+        }
+        let image = DBImage()
+        image.data = res.data
+        image.url = res.url.absoluteString
+        return image
     }
 }

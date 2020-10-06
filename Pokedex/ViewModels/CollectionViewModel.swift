@@ -48,7 +48,7 @@ class CollectionViewModel {
     }
 
     private func convert(_ pokemon: Pokemon) -> CellViewModel? {
-        guard let image = UIImage(data: pokemon.imageData) else {
+        guard let image = UIImage(data: pokemon.sprites.frontDefault.data) else {
             return nil
         }
         return CellViewModel(id: pokemon.id, text: pokemon.name.firstUppercase, image: image)

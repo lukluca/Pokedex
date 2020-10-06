@@ -9,7 +9,7 @@ import XCTest
 import RealmSwift
 @testable import Pokedex
 
-class DBFactoryTests: RealmTestCase {
+class DBFactoryTests: XCTest {
 
     func testMakesRealmConfiguredWithLibraryDirectoryFileUrl() {
         let sut = DBFactory()

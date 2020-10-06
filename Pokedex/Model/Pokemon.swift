@@ -10,6 +10,25 @@ import UIKit
 struct Pokemon {
     let id: Int
     let name: String
-    let imageData: Data
+    let sprites: Sprites
 }
 
+struct Sprites {
+    let frontDefault: DefaultImage
+    let frontShiny: Image?
+    let frontFemale: Image?
+    let frontShinyFemale: Image?
+    let backDefault: Image?
+    let backShiny: Image?
+    let backFemale: Image?
+    let backShinyFemale: Image?
+}
+
+struct Image {
+    let data: Data?
+    let url: URL
+}
+
+struct DefaultImage {
+    let data: Data
+}

@@ -19,8 +19,20 @@ enum RemoteError: Error {
 struct RemotePokemon {
     let id: Int?
     let name: String?
-    let imageURL: String?
+    let sprites: RemoteSprites?
 }
+
+struct RemoteSprites {
+    let frontDefault: String?
+    let frontShiny: String?
+    let frontFemale: String?
+    let frontShinyFemale: String?
+    let backDefault: String?
+    let backShiny: String?
+    let backFemale: String?
+    let backShinyFemale: String?
+}
+
 
 class RemotePokemonCatcher: PokemonCatcher {
 
@@ -100,7 +112,7 @@ class RemotePokemonCatcher: PokemonCatcher {
                 guard let self = self else {
                     return
                 }
-                guard let imageURL = pokemon.imageURL, let url = URL(string: imageURL) else {
+                guard let frontDefault = pokemon.sprites?.frontDefault, let url = URL(string: frontDefault) else {
                     return
                 }
                 self.downloadData(from: url) { data in
@@ -198,17 +210,55 @@ class RemotePokemonCatcher: PokemonCatcher {
         } else {
             arrayId = nil
         }
-        return RemotePokemon(id: arrayId, name: resource.name, imageURL: resource.sprites?.frontDefault)
+        return RemotePokemon(id: arrayId, name: resource.name, sprites: convert(resource.sprites))
+    }
+
+    private func convert(_ sprites: PKMPokemonSprites?) -> RemoteSprites? {
+        guard let sprites = sprites else {
+            return nil
+        }
+        return RemoteSprites(frontDefault: sprites.frontDefault,
+                frontShiny: sprites.frontShiny,
+                frontFemale: sprites.frontFemale,
+                frontShinyFemale: sprites.frontShinyFemale,
+                backDefault: sprites.backDefault,
+                backShiny: sprites.backShiny,
+                backFemale: sprites.backFemale,
+                backShinyFemale: sprites.backShinyFemale)
     }
 
     private func convert(_ resource: RemotePokemon, data: Data?) -> Pokemon? {
         guard let id = resource.id,
               let name = resource.name,
-              let imageData = data else {
+              let sprites = resource.sprites,
+              let data = data else {
             return nil
         }
 
-        return Pokemon(id: id, name: name, imageData: imageData)
+        return Pokemon(id: id, name: name, sprites: convert(sprites, defaultData: data))
+    }
+
+    private func convert(_ resource: RemoteSprites, defaultData: Data) -> Sprites {
+        Sprites(frontDefault: convert(defaultData),
+                frontShiny: convert(resource.frontShiny),
+                frontFemale: convert(resource.frontFemale),
+                frontShinyFemale: convert(resource.frontShinyFemale),
+                backDefault: convert(resource.backDefault),
+                backShiny: convert(resource.backShiny),
+                backFemale: convert(resource.backFemale),
+                backShinyFemale: convert(resource.backShinyFemale))
+    }
+
+    private func convert(_ data: Data) -> DefaultImage {
+        DefaultImage(data: data)
+    }
+
+    private func convert(_ resource: String?) -> Image? {
+        guard let res = resource, let url = URL(string: res) else {
+            return nil
+        }
+
+        return Image(data: nil, url: url)
     }
 
     private func downloadData(from url: URL, completion: @escaping (Data?) -> Void) {
