@@ -94,14 +94,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         let stub = CollectionViewModelStub()
         let sut = makeSUT(viewModel: stub)
 
-        let window = UIWindow()
-        window.rootViewController = sut
-        window.makeKeyAndVisible()
-
-        addTeardownBlock {
-            window.resignKey()
-            window.isHidden = true
-        }
+        makeWindowRootController(sut: sut)
 
         sut.loadViewIfNeeded()
 
@@ -148,6 +141,25 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         XCTAssertEqual(spy.cancelMorePokemonsIfNeededInvocations.first, indexPaths)
     }
 
+    func testIfUserPressesACellWithoutADataThePressHasNotEffect() {
+        let sut = makeSUT(viewModel: FilledCollectionViewModelWithEmptyCells())
+
+        sut.collectionView(sut.collectionView, didSelectItemAt: firstIndexPath)
+
+        XCTAssertNil(sut.presentedViewController)
+    }
+
+    func testIfUserPressesACellWithADataTheDetailViewControllerIsPushed() {
+        let sut = makeSUT(viewModel: OneItemCollectionViewModel())
+
+        makeWindowRootController(sut: sut)
+
+        sut.collectionView(sut.collectionView, didSelectItemAt: firstIndexPath)
+
+        let presented = sut.presentedViewController as? DetailViewController
+        XCTAssertNotNil(presented)
+    }
+
     //MARK: Helpers
 
     private func makeSUT(viewModel: CollectionViewModel = CollectionViewModel(pageSize: 50, catcher: DummyPokemonCatcher())) -> PokemonCollectionViewController {
@@ -157,6 +169,17 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
     private lazy var firstIndexPath = IndexPath(item: 0, section: 0)
 
     private lazy var indexPaths = [IndexPath(item: 5, section: 0), IndexPath(item: 10, section: 0), IndexPath(item: 20, section: 0)]
+
+    private func makeWindowRootController(sut: PokemonCollectionViewController) {
+        let window = UIWindow()
+        window.rootViewController = sut
+        window.makeKeyAndVisible()
+
+        addTeardownBlock {
+            window.resignKey()
+            window.isHidden = true
+        }
+    }
 }
 
 private class FilledCollectionViewModelWithEmptyCells: CollectionViewModel {
@@ -180,7 +203,7 @@ private class OneItemCollectionViewModel: CollectionViewModel {
     private let text: String
     private let image: UIImage
 
-    init(id: Int, text: String, image: UIImage) {
+    init(id: Int = 0, text: String = "", image: UIImage = UIImage()) {
         self.id = id
         self.text = text
         self.image = image

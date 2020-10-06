@@ -97,6 +97,12 @@ class PokemonCollectionViewController: UICollectionViewController {
         viewModel.numberOfItems(in: section)
     }
 
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if viewModel.item(at: indexPath) != nil {
+            present(DetailViewController(), animated: true)
+        }
+    }
+
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath)
 
