@@ -98,10 +98,13 @@ class PokemonCollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let itemVM = viewModel.item(at: indexPath) {
-            let vm = DetailViewModel(title: itemVM.text)
-            present(DetailViewController(viewModel: vm), animated: true)
+        guard let itemVM = viewModel.item(at: indexPath),
+              let sprites = viewModel.pokemon(at: itemVM.id)?.sprites else {
+            return
         }
+
+        let vm = DetailViewModel(title: itemVM.text, sprites: sprites)
+        present(DetailViewController(viewModel: vm), animated: true)
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

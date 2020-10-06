@@ -214,6 +214,10 @@ private class OneItemCollectionViewModel: CollectionViewModel {
         1
     }
 
+    override func pokemon(at index: Int) -> Pokemon? {
+        PokemonFixture().makePokemon(id: id, name: text)
+    }
+
     override func item(at indexPath: IndexPath) -> CellViewModel? {
         CellViewModel(id: id, text: text, image: image)
     }

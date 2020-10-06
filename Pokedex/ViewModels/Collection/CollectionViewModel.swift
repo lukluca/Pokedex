@@ -13,6 +13,7 @@ class CollectionViewModel {
     private let catcher: PokemonCatcher
 
     private var cellViewModels = [CellViewModel]()
+    private var pokemons = [Pokemon]()
 
     private var totalNumberOfItems = 0
 
@@ -28,6 +29,12 @@ class CollectionViewModel {
     func item(at indexPath: IndexPath) -> CellViewModel? {
         cellViewModels.first { (model: CellViewModel) -> Bool in
             model.id == indexPath.row
+        }
+    }
+
+    func pokemon(at index: Int) -> Pokemon? {
+        pokemons.first { (pokemon: Pokemon) -> Bool in
+            pokemon.id == index
         }
     }
 
@@ -48,6 +55,7 @@ class CollectionViewModel {
     }
 
     private func append(_ pokemons: [Pokemon]) {
+        self.pokemons.append(contentsOf: pokemons)
         let viewModels = ViewModelsConverter().convertIntoCellViewModels(pokemons)
         append(viewModels)
     }

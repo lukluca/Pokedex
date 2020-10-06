@@ -104,7 +104,8 @@ class DetailViewControllerTests: XCTestCase {
     //MARK: Helpers
 
     private func makeSUT(title: String = "") -> DetailViewController {
-        let vm = DetailViewModel(title: title)
+        let sprites = SpritesFixture().makeSprites()
+        let vm = DetailViewModel(title: title, sprites: sprites)
         return makeSUT(viewModel: vm)
     }
 
@@ -136,7 +137,7 @@ private class OneItemViewModel: DetailViewModel {
 
     init(image: UIImage = UIImage()) {
         self.image = image
-        super.init(title: "")
+        super.init(title: "", sprites: SpritesFixture().makeSprites())
     }
 
     override func numberOfItems(in section: Int) -> Int {

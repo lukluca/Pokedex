@@ -18,7 +18,7 @@ class PokemonFixture {
 
 class SpritesFixture {
 
-    func makeSprites(frontDefaultData: Data) -> Sprites {
+    func makeSprites(frontDefaultData: Data = Data()) -> Sprites {
         let img = ImageFixture().makeDefaultImage(with: frontDefaultData)
         return Sprites(frontDefault: img, frontShiny: nil, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
     }
