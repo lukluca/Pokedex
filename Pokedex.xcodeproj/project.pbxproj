@@ -16,6 +16,8 @@
 		32DC91F086A24C3F8E996D4E /* ViewModelsConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC97F07128693743F0814F /* ViewModelsConverter.swift */; };
 		32DC931225900C2B07D86ED7 /* CollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC95CBB4C8E85D86E82D18 /* CollectionViewModelTests.swift */; };
 		32DC9426D77014501A2EDF63 /* DBPokemonSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC95791A231AFB30AF674C /* DBPokemonSaver.swift */; };
+		32DC942A7CDCD59A7F6EB845 /* XCTestCase+AvailableVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC93B907692BA7544BE37A /* XCTestCase+AvailableVersion.swift */; };
+		32DC94666D40CC872942AD45 /* DetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC989CFB1E2538DE31F047 /* DetailViewModel.swift */; };
 		32DC94F7FFC0AF21FFA81F05 /* DBFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9E50D32000F7A8D68AC7 /* DBFactory.swift */; };
 		32DC951E26CB95CC5A0D235D /* DataFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9D78E4C053FA5A647FC7 /* DataFixture.swift */; };
 		32DC95750029F69AB867B2A4 /* PokemonCollectionViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9279B9CF991516E14908 /* PokemonCollectionViewControllerFactory.swift */; };
@@ -72,6 +74,7 @@
 		32DC92DE82E0A67C91D89FCA /* DBPokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBPokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC93581896CF7A6630BF91 /* XCTestCase+DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+DummyError.swift"; sourceTree = "<group>"; };
 		32DC938865BFA02DF8250B7F /* PokemonFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonFixture.swift; sourceTree = "<group>"; };
+		32DC93B907692BA7544BE37A /* XCTestCase+AvailableVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+AvailableVersion.swift"; sourceTree = "<group>"; };
 		32DC95791A231AFB30AF674C /* DBPokemonSaver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBPokemonSaver.swift; sourceTree = "<group>"; };
 		32DC95CBB4C8E85D86E82D18 /* CollectionViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewModelTests.swift; sourceTree = "<group>"; };
 		32DC965D3CB0E3D973BE7492 /* ViewModelsConverterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModelsConverterTests.swift; sourceTree = "<group>"; };
@@ -80,6 +83,7 @@
 		32DC9780D098B31A70961883 /* DummyPokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyPokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC97D59052B08A8FA4283D /* CollectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewModel.swift; sourceTree = "<group>"; };
 		32DC97F07128693743F0814F /* ViewModelsConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModelsConverter.swift; sourceTree = "<group>"; };
+		32DC989CFB1E2538DE31F047 /* DetailViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewModel.swift; sourceTree = "<group>"; };
 		32DC9AE8E50E566CB055B6E5 /* Pokemon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pokemon.swift; sourceTree = "<group>"; };
 		32DC9B5CA4B7E733AA6A5922 /* PokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonCatcher.swift; sourceTree = "<group>"; };
 		32DC9B6775BB1657ECB66AF3 /* PokemonList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonList.swift; sourceTree = "<group>"; };
@@ -164,6 +168,7 @@
 			children = (
 				32DC97D59052B08A8FA4283D /* CollectionViewModel.swift */,
 				32DC9D17312F23E29DC89661 /* CellViewModel.swift */,
+				32DC989CFB1E2538DE31F047 /* DetailViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -237,6 +242,7 @@
 				32DC96EB9E3C73549076D68D /* NSError+DummyError.swift */,
 				32DC9E997AF417A8F21E27D1 /* UIImage+Resource.swift */,
 				32DC9DE5D2522C504DF86F2A /* RealmTestCase.swift */,
+				32DC93B907692BA7544BE37A /* XCTestCase+AvailableVersion.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -585,6 +591,7 @@
 				32DC94F7FFC0AF21FFA81F05 /* DBFactory.swift in Sources */,
 				32DC91F086A24C3F8E996D4E /* ViewModelsConverter.swift in Sources */,
 				32DC98D2D2695B65A9EB9B22 /* DetailViewController.swift in Sources */,
+				32DC94666D40CC872942AD45 /* DetailViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -611,6 +618,7 @@
 				32DC951E26CB95CC5A0D235D /* DataFixture.swift in Sources */,
 				32DC9E8FC9D35D7CD94C3E92 /* PokemonFixture.swift in Sources */,
 				32DC96EC45360E7644FF6BDC /* DetailViewControllerTests.swift in Sources */,
+				32DC942A7CDCD59A7F6EB845 /* XCTestCase+AvailableVersion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -799,7 +807,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = PokedexTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -820,7 +828,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = PokedexTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

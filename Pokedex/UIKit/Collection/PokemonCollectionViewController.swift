@@ -98,8 +98,9 @@ class PokemonCollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if viewModel.item(at: indexPath) != nil {
-            present(DetailViewController(), animated: true)
+        if let itemVM = viewModel.item(at: indexPath) {
+            let vm = DetailViewModel(title: itemVM.text)
+            present(DetailViewController(viewModel: vm), animated: true)
         }
     }
 

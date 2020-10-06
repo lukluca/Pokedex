@@ -32,13 +32,10 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         
         XCTAssertEqual(sut.title, "Pokedex", "The title must be equal to 'Pokedex'")
     }
-    
-    private lazy var iOS13 = OperatingSystemVersion(majorVersion: 13, minorVersion: 0, patchVersion: 0)
-    
+
     @available(iOS 13.0, *)
     func testBackgroundColorForDarkAwareSystems() throws {
-        //ifVersionAtLeast 13
-        try XCTSkipUnless(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
+        try skipIfVersionAtLeast(iOS13)
 
         let sut = makeSUT()
         
@@ -46,8 +43,7 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
     }
     
     func testBackgroundColorIsWhite() throws {
-        //ifVersionBelow 13
-        try XCTSkipIf(ProcessInfo.processInfo.isOperatingSystemAtLeast(iOS13))
+        try skipIfVersionBelow(iOS13)
 
         let sut = makeSUT()
         
@@ -149,8 +145,9 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
         XCTAssertNil(sut.presentedViewController)
     }
 
-    func testIfUserPressesACellWithADataTheDetailViewControllerIsPushed() {
-        let sut = makeSUT(viewModel: OneItemCollectionViewModel())
+    func testIfUserPressesACellWithADataTheDetailViewControllerIsPresented() {
+        let text = "foo"
+        let sut = makeSUT(viewModel: OneItemCollectionViewModel(text: text))
 
         makeWindowRootController(sut: sut)
 
@@ -158,6 +155,9 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         let presented = sut.presentedViewController as? DetailViewController
         XCTAssertNotNil(presented)
+
+        let label = presented?.view.subviews.first{ $0 is UILabel } as? UILabel
+        XCTAssertEqual(label?.text, text)
     }
 
     //MARK: Helpers
