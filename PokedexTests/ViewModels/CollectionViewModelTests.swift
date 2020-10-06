@@ -27,7 +27,8 @@ class CollectionViewModelTests: XCTestCase {
 
     func testCatchesFirstPokemonsFromServiceWithSuccess() throws {
         let expectation = XCTestExpectation(description: "Completion invoked")
-        let pokemon = try makeAPokemon(withId: 0, name: "foo")
+        let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
+        let pokemon = makeAPokemon(withId: 0, name: "foo", imageData: imageData)
         let list = makeAPokemonList(withTotalPokemonCount: 100, andOnlyOnePokemon: pokemon)
         let mock = PokemonCatcherMock(pokemonList: list)
         let sut = makeSUT(catcher: mock)
@@ -39,7 +40,7 @@ class CollectionViewModelTests: XCTestCase {
                 let item = sut.item(at: IndexPath(item: 0, section: 0))
                 XCTAssertNotNil(item, "Item must be not nil if pokemon is present inside data source")
                 XCTAssertEqual(item?.text, "Foo", "Failure while converting pokemon")
-                XCTAssertEqual(item?.image.pngData(), UIImage(data: pokemon.sprites.frontDefault.data)?.pngData(), "Failure while converting pokemon")
+                XCTAssertEqual(item?.image.pngData(), UIImage(data: imageData)?.pngData(), "Failure while converting pokemon")
                 let nilItem = sut.item(at: IndexPath(item: 1, section: 0))
                 XCTAssertNil(nilItem, "Item must be nil if pokemon is no present inside data source")
                 expectation.fulfill()
@@ -193,12 +194,13 @@ class CollectionViewModelTests: XCTestCase {
         PokemonList(totalPokemonCount: count, pokemons: [pokemon])
     }
 
-    private func makeAPokemon(withId id: Int, name: String = "foo") throws -> Pokemon {
+    private func makeAPokemon(withId id: Int, name: String = "") throws -> Pokemon {
         let imageData = try UIImage.imageResourceAsData(insideBundleOf: CollectionViewModel.self)
-        let img = DefaultImage(data: imageData)
-        //Todo move to fixture
-        let sprites = Sprites(frontDefault: img, frontShiny: nil, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
-        return Pokemon(id: id, name: "foo", sprites: sprites)
+        return makeAPokemon(withId: id, name: name, imageData: imageData)
+    }
+
+    private func makeAPokemon(withId id: Int, name: String = "", imageData: Data) -> Pokemon {
+        PokemonFixture().makePokemon(id: id, name: name, frontDefaultData: imageData)
     }
 }
 

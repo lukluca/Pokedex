@@ -47,15 +47,9 @@ class CollectionViewModel {
         }
     }
 
-    private func convert(_ pokemon: Pokemon) -> CellViewModel? {
-        guard let image = UIImage(data: pokemon.sprites.frontDefault.data) else {
-            return nil
-        }
-        return CellViewModel(id: pokemon.id, text: pokemon.name.firstUppercase, image: image)
-    }
-
     private func append(_ pokemons: [Pokemon]) {
-        append(pokemons.compactMap {self.convert($0)})
+        let viewModels = ViewModelsConverter().convertIntoCellViewModels(pokemons)
+        append(viewModels)
     }
 
     private func append(_ items: [CellViewModel]) {
@@ -115,8 +109,4 @@ class CollectionViewModel {
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
     }
-}
-
-private extension StringProtocol {
-    var firstUppercase: String { prefix(1).uppercased() + dropFirst() }
 }

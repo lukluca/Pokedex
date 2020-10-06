@@ -193,7 +193,6 @@ class DBPokemonCatcherTests: RealmTestCase {
     }
 
     private func makeRandomData() -> Data {
-        let bytes = [UInt32](repeating: 0, count: 20).map { _ in arc4random() }
-        return Data(bytes: bytes, count: 20)
+        DataFixture().makeRandomData()
     }
 }

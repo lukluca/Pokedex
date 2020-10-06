@@ -26,10 +26,10 @@ class DBPokemonSaverTests: RealmTestCase {
     func testSavesPokemons() throws {
         let sut = makeSUT()
 
-        //Todo move inside fixture
-        let img = DefaultImage(data: Data())
-        let sprites = Sprites(frontDefault: img, frontShiny: nil, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
-        let pokemon = Pokemon(id: 10, name: "foo", sprites: sprites)
+        let id = 10
+        let name = "foo"
+        let data = DataFixture().makeRandomData()
+        let pokemon = PokemonFixture().makePokemon(id: id, name: name, frontDefaultData: data)
 
         sut.save(pokemons: [pokemon])
 
@@ -37,9 +37,9 @@ class DBPokemonSaverTests: RealmTestCase {
 
         XCTAssertNotNil(entities)
         XCTAssertEqual(entities?.count, 1)
-        XCTAssertEqual(entities?.first?.id, 10)
-        XCTAssertEqual(entities?.first?.name, "foo")
-        XCTAssertEqual(entities?.first?.sprites.frontDefault.data, Data())
+        XCTAssertEqual(entities?.first?.id, id)
+        XCTAssertEqual(entities?.first?.name, name)
+        XCTAssertEqual(entities?.first?.sprites.frontDefault.data, data)
     }
 
     //MARK: Helpers
