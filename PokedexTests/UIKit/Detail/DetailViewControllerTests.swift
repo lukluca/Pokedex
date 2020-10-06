@@ -65,12 +65,54 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertEqual(titleLabel?.textAlignment, .center)
     }
 
+    func testDoesHaveACollectionView() {
+        let sut = makeSUT()
+
+        XCTAssertNotNil(sut.collectionView)
+    }
+
+    func testRegisterImageCell() {
+        let sut = makeSUT()
+        let cell = sut.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
+
+        XCTAssertNotNil(cell, "The ImageCell must be registered")
+    }
+
+    func testConfiguresCollection() {
+        let sut = makeSUT()
+
+        XCTAssertEqual(sut.collectionView?.contentInsetAdjustmentBehavior, .always)
+        let dataSource = sut.collectionView?.dataSource as? DetailViewController
+        XCTAssertEqual(dataSource, sut, "Missing set dataSource delegate")
+    }
+
+    func testBindingCellFromCellViewModel() {
+        let image = UIImage()
+        let viewModel = OneItemViewModel(image: image)
+
+        let sut = makeSUT(viewModel: viewModel)
+
+        let cell = sut.collectionView(sut.collectionView!, cellForItemAt: firstIndexPath) as? ImageCollectionViewCell
+
+        XCTAssertNotNil(cell, "The cell must be a ImageCollectionViewCell")
+
+        let sameImageInstance = cell?.image === image
+
+        XCTAssertTrue(sameImageInstance, "Missing binding with cell")
+    }
+
     //MARK: Helpers
 
     private func makeSUT(title: String = "") -> DetailViewController {
         let vm = DetailViewModel(title: title)
-        return DetailViewController(viewModel: vm)
+        return makeSUT(viewModel: vm)
     }
+
+    private func makeSUT(viewModel: DetailViewModel) -> DetailViewController {
+        DetailViewController(viewModel: viewModel)
+    }
+
+    private lazy var firstIndexPath = IndexPath(item: 0, section: 0)
 }
 
 private extension DetailViewController {
@@ -81,5 +123,27 @@ private extension DetailViewController {
 
     var titleLabel: UILabel? {
         view.subviews.first{ $0 is UILabel } as? UILabel
+    }
+
+    var collectionView: UICollectionView? {
+        view.subviews.first{ $0 is UICollectionView } as? UICollectionView
+    }
+}
+
+private class OneItemViewModel: DetailViewModel {
+
+    private let image: UIImage
+
+    init(image: UIImage = UIImage()) {
+        self.image = image
+        super.init(title: "")
+    }
+
+    override func numberOfItems(in section: Int) -> Int {
+        1
+    }
+
+    override func item(at indexPath: IndexPath) -> DetailCellViewModel {
+        DetailCellViewModel(image: image)
     }
 }

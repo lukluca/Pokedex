@@ -1,4 +1,9 @@
-// See LICENSE.txt for licensing information
+//
+//  CellViewModel.swift
+//  Pokedex
+//
+//  Created by Luca Tagliabue on 3/10/2020.
+//
 
 import UIKit
 
