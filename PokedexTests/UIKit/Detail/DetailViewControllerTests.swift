@@ -85,6 +85,7 @@ class DetailViewControllerTests: XCTestCase {
     func testConfiguresCollection() {
         let sut = makeSUT()
 
+        XCTAssertEqual(sut.collectionView?.backgroundColor, .clear)
         XCTAssertEqual(sut.collectionView?.contentInsetAdjustmentBehavior, .always)
         let dataSource = sut.collectionView?.dataSource as? DetailViewController
         XCTAssertEqual(dataSource, sut, "Missing set dataSource delegate")

@@ -62,8 +62,9 @@ class DetailViewController: UIViewController {
         view.addSubview(closeButton)
 
         closeButton.translatesAutoresizingMaskIntoConstraints = false
-        let constraints = [closeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-                           closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+        let guide = view.safeAreaLayoutGuide
+        let constraints = [closeButton.topAnchor.constraint(equalTo: guide.topAnchor, constant: 30),
+                           closeButton.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20),
                            closeButton.heightAnchor.constraint(equalToConstant: 44),
                            closeButton.widthAnchor.constraint(equalTo: closeButton.heightAnchor)]
         NSLayoutConstraint.activate(constraints)
@@ -77,9 +78,10 @@ class DetailViewController: UIViewController {
         label.textAlignment = .center
 
         label.translatesAutoresizingMaskIntoConstraints = false
-        let constraints = [label.topAnchor.constraint(equalTo: view.topAnchor, constant: 80),
-                           label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-                           label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)]
+        let guide = view.safeAreaLayoutGuide
+        let constraints = [label.topAnchor.constraint(equalTo: guide.topAnchor, constant: 80),
+                           label.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 30),
+                           label.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -30)]
         NSLayoutConstraint.activate(constraints)
     }
 
@@ -92,14 +94,16 @@ class DetailViewController: UIViewController {
         view.addSubview(collection)
 
         collection.translatesAutoresizingMaskIntoConstraints = false
-        let constraints = [collection.topAnchor.constraint(equalTo: view.topAnchor, constant: 150),
-                           collection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-                           collection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+        let guide = view.safeAreaLayoutGuide
+        let constraints = [collection.topAnchor.constraint(equalTo: guide.topAnchor, constant: 150),
+                           collection.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 30),
+                           collection.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -30),
                            collection.heightAnchor.constraint(equalToConstant: 200)]
         NSLayoutConstraint.activate(constraints)
     }
 
     private func configureCollectionView(_ collection: UICollectionView) {
+        collection.backgroundColor = .clear
         collection.dataSource = self
         collection.contentInsetAdjustmentBehavior = .always
         collection.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
