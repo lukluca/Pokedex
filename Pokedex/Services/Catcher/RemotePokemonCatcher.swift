@@ -38,12 +38,14 @@ class RemotePokemonCatcher: PokemonCatcher {
 
     private let pokemonAPI = PokemonAPI()
     private let nextHandler: DBPokemonSaver
+    private let downloader: DataDownloader
 
     private var pagedObject: PKMPagedObject<PKMPokemon>?
 
     private var pagesOnDownload = Set<Int>()
 
-    init(nextHandler: DBPokemonSaver) {
+    init(downloader: DataDownloader, nextHandler: DBPokemonSaver) {
+        self.downloader = downloader
         self.nextHandler = nextHandler
     }
 
@@ -132,7 +134,6 @@ class RemotePokemonCatcher: PokemonCatcher {
                             return
                         }
                         completion(Result.success(pokemons))
-
                     }
                 }
             }
@@ -203,6 +204,8 @@ class RemotePokemonCatcher: PokemonCatcher {
         }
     }
 
+    //MARK: Conversion
+
     private func convert(_ resource: PKMPokemon) -> RemotePokemon {
         let arrayId: Int?
         if let id = resource.id {
@@ -261,12 +264,9 @@ class RemotePokemonCatcher: PokemonCatcher {
         return Image(data: nil, url: url)
     }
 
-    private func downloadData(from url: URL, completion: @escaping (Data?) -> Void) {
-        let task = pokemonAPI.session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) -> () in
-            completion(data)
-        }
-
-        task.resume()
+    @discardableResult
+    private func downloadData(from url: URL, completion: @escaping (Data?) -> Void) -> URLSessionDataTask {
+        downloader.download(from: url, completion: completion)
     }
 
     func taskOngoingFor(for index: Int) -> Bool {

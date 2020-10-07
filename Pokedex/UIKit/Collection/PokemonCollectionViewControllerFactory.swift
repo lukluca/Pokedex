@@ -12,7 +12,7 @@ struct PokemonCollectionViewControllerFactory {
     func make() -> PokemonCollectionViewController {
         let db = DBFactory().make()
         let saver = DBPokemonSaver(db: db)
-        let remote = RemotePokemonCatcher(nextHandler: saver)
+        let remote = RemotePokemonCatcher(downloader: RemoteDataDownloader(session: URLSession.shared), nextHandler: saver)
         let database = DBPokemonCatcher(db: db, nextHandler: remote)
         let viewModel = CollectionViewModel(pageSize: 50, catcher: database)
         return PokemonCollectionViewController(collectionViewLayout: PokemonCollectionViewFlowLayout(), viewModel: viewModel)
