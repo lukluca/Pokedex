@@ -25,6 +25,7 @@
 		32DC95C62A431ADA49806AC7 /* UIImage+Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9E997AF417A8F21E27D1 /* UIImage+Resource.swift */; };
 		32DC95DD38471E7F15BC2F8B /* DBEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9E2BF4003002EDC8AB53 /* DBEntities.swift */; };
 		32DC964B43EA517205A9AF14 /* RemotePokemonCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9040DBC4E66CF028DD77 /* RemotePokemonCatcher.swift */; };
+		32DC96660F50F6A11C4B9656 /* DataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9323168B2A134EB84C26 /* DataDownloader.swift */; };
 		32DC966715EE4A6200D6E2E5 /* NSError+DummyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC96EB9E3C73549076D68D /* NSError+DummyError.swift */; };
 		32DC96D77C117BCB0190A525 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC9C92B0053ADE1D136B43 /* ImageCollectionViewCell.swift */; };
 		32DC96EC45360E7644FF6BDC /* DetailViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC91F1F28C9D2C18198B8B /* DetailViewControllerTests.swift */; };
@@ -82,6 +83,7 @@
 		32DC9279B9CF991516E14908 /* PokemonCollectionViewControllerFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonCollectionViewControllerFactory.swift; sourceTree = "<group>"; };
 		32DC92C20417BB37F0B0C93E /* DetailViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewModel.swift; sourceTree = "<group>"; };
 		32DC92DE82E0A67C91D89FCA /* DBPokemonCatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBPokemonCatcher.swift; sourceTree = "<group>"; };
+		32DC9323168B2A134EB84C26 /* DataDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataDownloader.swift; sourceTree = "<group>"; };
 		32DC93581896CF7A6630BF91 /* XCTestCase+DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+DummyError.swift"; sourceTree = "<group>"; };
 		32DC938865BFA02DF8250B7F /* PokemonFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokemonFixture.swift; sourceTree = "<group>"; };
 		32DC93B907692BA7544BE37A /* XCTestCase+AvailableVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+AvailableVersion.swift"; sourceTree = "<group>"; };
@@ -206,6 +208,14 @@
 			path = Testing;
 			sourceTree = "<group>";
 		};
+		32DC95A1A8F3424B517E5608 /* Downloader */ = {
+			isa = PBXGroup;
+			children = (
+				32DC9323168B2A134EB84C26 /* DataDownloader.swift */,
+			);
+			path = Downloader;
+			sourceTree = "<group>";
+		};
 		32DC96AB6218C4FCF0C8F0EF /* Converters */ = {
 			isa = PBXGroup;
 			children = (
@@ -299,6 +309,7 @@
 				32DC95791A231AFB30AF674C /* DBPokemonSaver.swift */,
 				32DC9974D154691FC2F7E99F /* DBEntities */,
 				32DC9E50D32000F7A8D68AC7 /* DBFactory.swift */,
+				32DC95A1A8F3424B517E5608 /* Downloader */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -648,6 +659,7 @@
 				32DC90044C201EA2A30BE9C3 /* DetailCellViewModel.swift in Sources */,
 				32DC9128312AB309989A109F /* DetailCollectionViewFlowLayout.swift in Sources */,
 				32DC96D77C117BCB0190A525 /* ImageCollectionViewCell.swift in Sources */,
+				32DC96660F50F6A11C4B9656 /* DataDownloader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
