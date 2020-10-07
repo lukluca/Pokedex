@@ -16,6 +16,18 @@ class CollectionViewModelTests: XCTestCase {
         XCTAssertEqual(sut.numberOfItems(in: 0), 0)
     }
 
+    func testOnInitGetsNilPokemon() {
+        let sut = makeSUT()
+
+        XCTAssertNil(sut.pokemon(at: 0), "Too much pokemon!")
+    }
+
+    func testOnInitGetsNilItem() {
+        let sut = makeSUT()
+
+        XCTAssertNil(sut.item(at: IndexPath(item: 0, section: 0)))
+    }
+
     func testCatchesFirstPokemonsFromService() {
         let spy = PokemonCatcherSpy()
         let sut = makeSUT(catcher: spy)
@@ -40,7 +52,7 @@ class CollectionViewModelTests: XCTestCase {
                 let item = sut.item(at: IndexPath(item: 0, section: 0))
                 XCTAssertNotNil(item, "Item must be not nil if pokemon is present inside data source")
                 XCTAssertEqual(item?.text, "Foo", "Failure while converting pokemon")
-                XCTAssertEqual(item?.image.pngData(), UIImage(data: imageData)?.pngData(), "Failure while converting pokemon")
+                XCTAssertImageEqualToData(item?.image, imageData, "Failure while converting pokemon")
                 let nilItem = sut.item(at: IndexPath(item: 1, section: 0))
                 XCTAssertNil(nilItem, "Item must be nil if pokemon is no present inside data source")
                 expectation.fulfill()
@@ -179,6 +191,18 @@ class CollectionViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
+    func testGetsNilPokemon() throws {
+        let list = try makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemonWithId: 8)
+        let mock = PokemonCatcherMock(pokemonList: list)
+        let sut = makeSUT(catcher: mock)
+
+        sut.getPokemons { result in }
+
+        mock.simulateFirstPageOnSuccess()
+
+        XCTAssertNil(sut.pokemon(at: 7), "Too much pokemon!")
+    }
+
     func testGetsPokemon() throws {
         let expectedPokemon = try makeAPokemon(withId: 8)
         let list = makeAPokemonList(withTotalPokemonCount: 10, andOnlyOnePokemon: expectedPokemon)
@@ -295,31 +319,30 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
     }
 }
 
-private extension XCTest {
+//MARK: XCTAssert Pokemon and equalities
 
-    func XCTAssertPokemonEqual(_ pokemon1: Pokemon?, _ pokemon2: Pokemon?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertEqual(pokemon1?.name, pokemon2?.name, message(), file: file, line: line)
-        XCTAssertEqual(pokemon1?.id, pokemon2?.id, message(), file: file, line: line)
-        XCTAssertSpritesEqual(pokemon1?.sprites, pokemon2?.sprites, message(), file: file, line: line)
-    }
+private func XCTAssertPokemonEqual(_ pokemon1: Pokemon?, _ pokemon2: Pokemon?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
+    XCTAssertEqual(pokemon1?.name, pokemon2?.name, message(), file: file, line: line)
+    XCTAssertEqual(pokemon1?.id, pokemon2?.id, message(), file: file, line: line)
+    XCTAssertSpritesEqual(pokemon1?.sprites, pokemon2?.sprites, message(), file: file, line: line)
+}
 
-    func XCTAssertSpritesEqual(_ sprites1: Sprites?, _ sprites2: Sprites?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertDefaultImageEqual(sprites1?.frontDefault, sprites2?.frontDefault, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.frontShiny, sprites2?.frontShiny, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.frontFemale, sprites2?.frontFemale, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.frontShinyFemale, sprites2?.frontShinyFemale, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.backDefault, sprites2?.backDefault, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.backShiny, sprites2?.backShiny, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.backFemale, sprites2?.backFemale, message(), file: file, line: line)
-        XCTAssertImageEqual(sprites1?.backShinyFemale, sprites2?.backShinyFemale, message(), file: file, line: line)
-    }
+private func XCTAssertSpritesEqual(_ sprites1: Sprites?, _ sprites2: Sprites?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
+    XCTAssertDefaultImageEqual(sprites1?.frontDefault, sprites2?.frontDefault, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.frontShiny, sprites2?.frontShiny, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.frontFemale, sprites2?.frontFemale, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.frontShinyFemale, sprites2?.frontShinyFemale, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.backDefault, sprites2?.backDefault, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.backShiny, sprites2?.backShiny, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.backFemale, sprites2?.backFemale, message(), file: file, line: line)
+    XCTAssertImageEqual(sprites1?.backShinyFemale, sprites2?.backShinyFemale, message(), file: file, line: line)
+}
 
-    func XCTAssertDefaultImageEqual(_ defaultImage1: DefaultImage?, _ defaultImage2: DefaultImage?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertEqual(defaultImage1?.data, defaultImage2?.data, message(), file: file, line: line)
-    }
+private func XCTAssertDefaultImageEqual(_ defaultImage1: DefaultImage?, _ defaultImage2: DefaultImage?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
+    XCTAssertEqual(defaultImage1?.data, defaultImage2?.data, message(), file: file, line: line)
+}
 
-    func XCTAssertImageEqual(_ image1: Image?, _ image2: Image?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertEqual(image1?.data, image2?.data, message(), file: file, line: line)
-        XCTAssertEqual(image1?.url, image2?.url, message(), file: file, line: line)
-    }
+private  func XCTAssertImageEqual(_ image1: Image?, _ image2: Image?, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) {
+    XCTAssertEqual(image1?.data, image2?.data, message(), file: file, line: line)
+    XCTAssertEqual(image1?.url, image2?.url, message(), file: file, line: line)
 }
