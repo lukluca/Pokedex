@@ -56,6 +56,6 @@ class DetailViewModelTests: XCTestCase {
 
     private func makeSUT(frontDefaultData: Data, frontShinyData: Data? = nil) -> DetailViewModel {
         let sprites = SpritesFixture().makeSprites(frontDefaultData: frontDefaultData, frontShinyData: frontShinyData)
-        return DetailViewModel(title: "", sprites: sprites)
+        return DetailViewModel(title: "", sprites: sprites, downloader: DummyDataDownloader())
     }
 }

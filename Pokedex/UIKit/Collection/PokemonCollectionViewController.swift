@@ -103,8 +103,8 @@ class PokemonCollectionViewController: UICollectionViewController {
             return
         }
 
-        let vm = DetailViewModel(title: itemVM.text, sprites: sprites)
-        present(DetailViewController(viewModel: vm), animated: true)
+        let viewController = DetailViewControllerFactory().make(title: itemVM.text, sprites: sprites)
+        present(viewController, animated: true)
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

@@ -11,10 +11,12 @@ class DetailViewModel {
     let title: String
     private var collection = [DetailCellViewModel]()
     private let sprites: Sprites
+    private let downloader: DataDownloader
 
-    init(title: String, sprites: Sprites) {
+    init(title: String, sprites: Sprites, downloader: DataDownloader) {
         self.title = title
         self.sprites = sprites
+        self.downloader = downloader
     }
 
     func numberOfItems(in section: Int) -> Int {
@@ -59,6 +61,19 @@ class DetailViewModel {
     private func appendIfPresent(_ cellViewModel: DetailCellViewModel?) {
         if let model = cellViewModel {
             collection.append(model)
+        }
+    }
+
+    private func downloadIfNeeded(_ image: Image?) {
+        guard let img = image else {
+            return
+        }
+        guard img.data == nil else {
+            return
+        }
+
+        downloader.download(from: img.url) { data in
+            
         }
     }
 }

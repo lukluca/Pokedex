@@ -123,7 +123,7 @@ class DetailViewControllerTests: XCTestCase {
 
     private func makeSUT(title: String) -> DetailViewController {
         let sprites = SpritesFixture().makeSprites()
-        let vm = DetailViewModel(title: title, sprites: sprites)
+        let vm = DetailViewModel(title: title, sprites: sprites, downloader: DummyDataDownloader())
         return makeSUT(viewModel: vm)
     }
 
@@ -152,7 +152,7 @@ private extension DetailViewController {
 private class DummyDetailViewModel: DetailViewModel {
 
     init() {
-        super.init(title: "", sprites: SpritesFixture().makeSprites())
+        super.init(title: "", sprites: SpritesFixture().makeSprites(), downloader: DummyDataDownloader())
     }
 
     override func numberOfItems(in section: Int) -> Int {
