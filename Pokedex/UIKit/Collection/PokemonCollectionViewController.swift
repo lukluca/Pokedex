@@ -99,11 +99,11 @@ class PokemonCollectionViewController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let itemVM = viewModel.item(at: indexPath),
-              let sprites = viewModel.pokemon(at: itemVM.id)?.sprites else {
+              let pokemon = viewModel.pokemon(at: itemVM.id) else {
             return
         }
 
-        let viewController = DetailViewControllerFactory().make(title: itemVM.text, sprites: sprites)
+        let viewController = DetailViewControllerFactory().make(id: pokemon.id, title: itemVM.text, sprites: pokemon.sprites)
         present(viewController, animated: true)
     }
 
