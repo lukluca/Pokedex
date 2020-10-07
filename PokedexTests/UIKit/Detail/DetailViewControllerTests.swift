@@ -116,7 +116,36 @@ class DetailViewControllerTests: XCTestCase {
 
         sut.loadViewIfNeeded()
 
-        XCTAssertEqual(spy.startLoadImagesInvocationsCount, 1, "Missing load image")
+        XCTAssertEqual(spy.startLoadImagesInvocationsCount, 1, "Missing start load image")
+    }
+
+    func testOnViewDidLoadAttachesToViewModelUpdates() {
+        let spy = DetailViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.loadViewIfNeeded()
+
+        XCTAssertNotNil(spy.onItemAdded, "Missing attach to view model update")
+    }
+
+    func testOnViewWillDisappearStopLoadImages() {
+        let spy = DetailViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.viewWillDisappear(false)
+
+        XCTAssertEqual(spy.stopLoadImagesInvocationsCount, 1, "Missing stop load image")
+    }
+
+    func testOnViewWillDisappearDetachesToViewModelUpdates() {
+        let spy = DetailViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.loadViewIfNeeded()
+
+        sut.viewWillDisappear(false)
+
+        XCTAssertNil(spy.onItemAdded, "Missing detach to view model update")
     }
 
     //MARK: Helpers
@@ -167,9 +196,14 @@ private class DummyDetailViewModel: DetailViewModel {
 private class DetailViewModelSpy: DummyDetailViewModel {
 
     private(set) var startLoadImagesInvocationsCount = 0
+    private(set) var stopLoadImagesInvocationsCount = 0
 
     override func startLoadImages() {
         startLoadImagesInvocationsCount += 1
+    }
+
+    override func stopLoadImages() {
+        stopLoadImagesInvocationsCount += 1
     }
 }
 

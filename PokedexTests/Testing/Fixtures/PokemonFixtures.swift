@@ -1,5 +1,5 @@
 //
-//  PokemonFixture.swift
+//  PokemonFixtures.swift
 //  PokedexTests
 //
 //  Created by Luca Tagliabue on 6/10/2020.
@@ -25,8 +25,12 @@ class SpritesFixture {
         } else {
             frontShiny = nil
         }
-        let img = ImageFixture().makeDefaultImage(with: frontDefaultData)
-        return Sprites(frontDefault: img, frontShiny: frontShiny, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
+        return makeSprites(frontDefaultData: frontDefaultData, frontShiny: frontShiny)
+    }
+
+    func makeSprites(frontDefaultData: Data = Data(), frontShiny: Image?) -> Sprites {
+        let frontDefault = ImageFixture().makeDefaultImage(with: frontDefaultData)
+        return Sprites(frontDefault: frontDefault, frontShiny: frontShiny, frontFemale: nil, frontShinyFemale: nil, backDefault: nil, backShiny: nil, backFemale: nil, backShinyFemale: nil)
     }
 }
 
@@ -40,6 +44,10 @@ class ImageFixture {
         guard let url = URL(string: "https:www.foo.com") else {
             return nil
         }
-        return Image(data: data, url: url)
+        return makeImage(data: data, url: url)
+    }
+
+    func makeImage(data: Data?, url: URL) -> Image {
+        Image(data: data, url: url)
     }
 }

@@ -12,12 +12,15 @@ class DetailViewModel {
     private var collection = [DetailCellViewModel]()
     private let sprites: Sprites
     private let downloader: DataDownloader
+    private var tasks = [URLSessionTask]()
 
     init(title: String, sprites: Sprites, downloader: DataDownloader) {
         self.title = title
         self.sprites = sprites
         self.downloader = downloader
     }
+
+    var onItemAdded: ((IndexPath) -> ())?
 
     func numberOfItems(in section: Int) -> Int {
         collection.count
@@ -28,17 +31,30 @@ class DetailViewModel {
     }
 
     func startLoadImages() {
-        appendIfPresent(convert(sprites.frontDefault))
-        appendIfPresent(convert(sprites.frontShiny))
-        appendIfPresent(convert(sprites.frontFemale))
-        appendIfPresent(convert(sprites.frontShinyFemale))
-        appendIfPresent(convert(sprites.backDefault))
-        appendIfPresent(convert(sprites.backShiny))
-        appendIfPresent(convert(sprites.backFemale))
-        appendIfPresent(convert(sprites.backShinyFemale))
+        appendedIfPresent(convert(sprites.frontDefault))
+        appendedIfPresent(convert(sprites.frontShiny))
+        appendedIfPresent(convert(sprites.frontFemale))
+        appendedIfPresent(convert(sprites.frontShinyFemale))
+        appendedIfPresent(convert(sprites.backDefault))
+        appendedIfPresent(convert(sprites.backShiny))
+        appendedIfPresent(convert(sprites.backFemale))
+        appendedIfPresent(convert(sprites.backShinyFemale))
 
-        //Todo check if no data, download
-        //everytime i have a data, deliver info to vc
+        downloadIfNeeded(sprites.frontShiny)
+        downloadIfNeeded(sprites.frontFemale)
+        downloadIfNeeded(sprites.frontShinyFemale)
+        downloadIfNeeded(sprites.backDefault)
+        downloadIfNeeded(sprites.backShiny)
+        downloadIfNeeded(sprites.backFemale)
+        downloadIfNeeded(sprites.backShinyFemale)
+    }
+
+    func stopLoadImages() {
+        guard !tasks.isEmpty else {
+            return
+        }
+        tasks.forEach { $0.cancel() }
+        tasks.removeAll()
     }
 
     private func convert(_ item: DefaultImage) -> DetailCellViewModel? {
@@ -49,7 +65,11 @@ class DetailViewModel {
     }
 
     private func convert(_ item: Image?) -> DetailCellViewModel? {
-        guard let data = item?.data else {
+        convert(item?.data)
+    }
+
+    private func convert(_ data: Data?) -> DetailCellViewModel? {
+        guard let data = data else {
             return nil
         }
         guard let image = UIImage(data: data) else {
@@ -58,10 +78,14 @@ class DetailViewModel {
         return DetailCellViewModel(image: image)
     }
 
-    private func appendIfPresent(_ cellViewModel: DetailCellViewModel?) {
-        if let model = cellViewModel {
-            collection.append(model)
+    @discardableResult
+    private func appendedIfPresent(_ cellViewModel: DetailCellViewModel?) -> Bool {
+        guard let model = cellViewModel else {
+            return false
         }
+
+        collection.append(model)
+        return true
     }
 
     private func downloadIfNeeded(_ image: Image?) {
@@ -72,8 +96,22 @@ class DetailViewModel {
             return
         }
 
-        downloader.download(from: img.url) { data in
-            
+        let task = downloader.download(from: img.url) { [weak self] data in
+            guard let self = self else {
+                return
+            }
+
+            let appended = self.appendedIfPresent(self.convert(data))
+
+            guard appended else {
+                return
+            }
+
+            DispatchQueue.main.async {
+                self.onItemAdded?(IndexPath(item: (self.collection.count - 1), section: 0))
+            }
         }
+
+        tasks.append(task)
     }
 }
