@@ -32,7 +32,14 @@ class DetailViewController: UIViewController {
         } else {
             view.backgroundColor = .white
         }
-        
+
+        addCustomSubviews()
+
+        viewModel.startLoadImages()
+    }
+
+    private func addCustomSubviews() {
+
         if #available(iOS 13, *) {
         } else {
             addCloseButton()
@@ -93,8 +100,6 @@ class DetailViewController: UIViewController {
     }
 
     private func configureCollectionView(_ collection: UICollectionView) {
-        collection.backgroundColor = .blue
-
         collection.dataSource = self
         collection.contentInsetAdjustmentBehavior = .always
         collection.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)

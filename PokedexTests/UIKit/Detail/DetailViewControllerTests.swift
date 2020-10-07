@@ -9,6 +9,10 @@
 import XCTest
 @testable import Pokedex
 
+enum DetailViewControllerTestsError: Error {
+    case missingRequiredCollection
+}
+
 class DetailViewControllerTests: XCTestCase {
 
     @available(iOS 13.0, *)
@@ -86,13 +90,17 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertEqual(dataSource, sut, "Missing set dataSource delegate")
     }
 
-    func testBindingCellFromCellViewModel() {
+    func testBindingCellFromCellViewModel() throws {
         let image = UIImage()
         let viewModel = OneItemViewModel(image: image)
 
         let sut = makeSUT(viewModel: viewModel)
 
-        let cell = sut.collectionView(sut.collectionView!, cellForItemAt: firstIndexPath) as? ImageCollectionViewCell
+        guard let collectionView = sut.collectionView else {
+            throw DetailViewControllerTestsError.missingRequiredCollection
+        }
+
+        let cell = sut.collectionView(collectionView, cellForItemAt: firstIndexPath) as? ImageCollectionViewCell
 
         XCTAssertNotNil(cell, "The cell must be a ImageCollectionViewCell")
 
@@ -101,15 +109,24 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertTrue(sameImageInstance, "Missing binding with cell")
     }
 
+    func testOnViewDidLoadStartLoadImages() {
+        let spy = DetailViewModelSpy()
+        let sut = makeSUT(viewModel: spy)
+
+        sut.loadViewIfNeeded()
+
+        XCTAssertEqual(spy.startLoadImagesInvocationsCount, 1, "Missing load image")
+    }
+
     //MARK: Helpers
 
-    private func makeSUT(title: String = "") -> DetailViewController {
+    private func makeSUT(title: String) -> DetailViewController {
         let sprites = SpritesFixture().makeSprites()
         let vm = DetailViewModel(title: title, sprites: sprites)
         return makeSUT(viewModel: vm)
     }
 
-    private func makeSUT(viewModel: DetailViewModel) -> DetailViewController {
+    private func makeSUT(viewModel: DetailViewModel = DummyDetailViewModel()) -> DetailViewController {
         DetailViewController(viewModel: viewModel)
     }
 
@@ -131,13 +148,37 @@ private extension DetailViewController {
     }
 }
 
-private class OneItemViewModel: DetailViewModel {
+private class DummyDetailViewModel: DetailViewModel {
+
+    init() {
+        super.init(title: "", sprites: SpritesFixture().makeSprites())
+    }
+
+    override func numberOfItems(in section: Int) -> Int {
+        0
+    }
+
+    override func item(at indexPath: IndexPath) -> DetailCellViewModel {
+        DetailCellViewModel(image: UIImage())
+    }
+}
+
+private class DetailViewModelSpy: DummyDetailViewModel {
+
+    private(set) var startLoadImagesInvocationsCount = 0
+
+    override func startLoadImages() {
+        startLoadImagesInvocationsCount += 1
+    }
+}
+
+private class OneItemViewModel: DummyDetailViewModel {
 
     private let image: UIImage
 
     init(image: UIImage = UIImage()) {
         self.image = image
-        super.init(title: "", sprites: SpritesFixture().makeSprites())
+        super.init()
     }
 
     override func numberOfItems(in section: Int) -> Int {
