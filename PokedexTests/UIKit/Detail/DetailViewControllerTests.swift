@@ -32,18 +32,7 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertEqual(sut.view.backgroundColor, .white, "We want a white background")
     }
 
-    @available(iOS 13.0, *)
-    func testDoesNotHaveACloseButton() throws  {
-        try skipIfVersionBelow(iOS13)
-
-        let sut = makeSUT()
-
-        XCTAssertNil(sut.closeButton, "Use swipe down gesture instead")
-    }
-
     func testDoesHaveACloseButton() throws  {
-        try skipIfVersionAtLeast(iOS13)
-
         let sut = makeSUT()
 
         let closeButton = sut.closeButton

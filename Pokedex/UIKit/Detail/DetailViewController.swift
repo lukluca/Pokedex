@@ -54,12 +54,7 @@ class DetailViewController: UIViewController {
     }
 
     private func addCustomSubviews() {
-
-        if #available(iOS 13, *) {
-        } else {
-            addCloseButton()
-        }
-
+        addCloseButton()
         addTitleLabel()
         let collection = makeCollectionView()
         addCollectionView(collection)
