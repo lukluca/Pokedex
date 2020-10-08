@@ -21,17 +21,30 @@ class SpritesDownloader: SpritesLoader {
         self.nextHandler = nextHandler
     }
 
-    func loadIfNeeded(sprites: Sprites) {
-        downloadIfNeeded(sprites.frontShiny, for: .frontShiny)
-        downloadIfNeeded(sprites.frontFemale, for: .frontFemale)
-        downloadIfNeeded(sprites.frontShinyFemale, for: .frontShinyFemale)
-        downloadIfNeeded(sprites.backDefault, for: .backDefault)
-        downloadIfNeeded(sprites.backShiny, for: .backShiny)
-        downloadIfNeeded(sprites.backFemale, for: .backFemale)
-        downloadIfNeeded(sprites.backShinyFemale, for: .backShinyFemale)
+    func loadIfNeeded(sprites: Sprites, of type: SpritesType) {
+
+        switch type {
+        case .frontShiny:
+            downloadIfNeeded(sprites.frontShiny, for: type)
+        case .frontFemale:
+            downloadIfNeeded(sprites.frontFemale, for: type)
+        case .frontShinyFemale:
+            downloadIfNeeded(sprites.frontShinyFemale, for: type)
+        case .backDefault:
+            downloadIfNeeded(sprites.backDefault, for: type)
+        case .backShiny:
+            downloadIfNeeded(sprites.backShiny, for: type)
+        case .backFemale:
+            downloadIfNeeded(sprites.backFemale, for: type)
+        case .backShinyFemale:
+            downloadIfNeeded(sprites.backShinyFemale, for: type)
+        }
     }
 
     private func downloadIfNeeded(_ image: Image?, for type: SpritesType) {
+        guard let img = image else {
+            return
+        }
 
         let dbSprites = nextHandler.pokemon?.sprites
 
@@ -75,9 +88,6 @@ class SpritesDownloader: SpritesLoader {
             }
         }
 
-        guard let img = image else {
-            return
-        }
         guard img.data == nil else {
             return
         }

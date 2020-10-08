@@ -11,6 +11,6 @@ protocol SpritesLoader: class {
 
     var onDataLoad: ((Data) -> ())? { get set }
 
-    func loadIfNeeded(sprites: Sprites)
+    func loadIfNeeded(sprites: Sprites, of type: SpritesType)
     func stopLoad()
 }

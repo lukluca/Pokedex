@@ -35,11 +35,15 @@ class DetailViewController: UIViewController {
 
         addCustomSubviews()
 
+        viewModel.startLoadImages()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
         viewModel.onItemAdded = { [weak self] path in
             self?.collectionView?.insertItems(at: [path])
         }
-
-        viewModel.startLoadImages()
     }
 
     override func viewWillDisappear(_ animated: Bool) {

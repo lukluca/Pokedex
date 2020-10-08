@@ -31,28 +31,45 @@ class DetailViewModel {
 
     func startLoadImages() {
 
-        loader.onDataLoad = { data in
+        loader.onDataLoad = { [weak self] data in
+            guard let self = self else {
+                return
+            }
+
             let appended = self.appendedIfPresent(self.convert(data))
 
             guard appended else {
                 return
             }
 
-            DispatchQueue.main.async {
-                self.onItemAdded?(IndexPath(item: (self.collection.count - 1), section: 0))
-            }
+            let item = self.collection.count - 1
+
+            self.onItemAdded?(IndexPath(item: item, section: 0))
         }
 
         appendedIfPresent(convert(sprites.frontDefault))
-        appendedIfPresent(convert(sprites.frontShiny))
-        appendedIfPresent(convert(sprites.frontFemale))
-        appendedIfPresent(convert(sprites.frontShinyFemale))
-        appendedIfPresent(convert(sprites.backDefault))
-        appendedIfPresent(convert(sprites.backShiny))
-        appendedIfPresent(convert(sprites.backFemale))
-        appendedIfPresent(convert(sprites.backShinyFemale))
 
-        loader.loadIfNeeded(sprites: sprites)
+        if !appendedIfPresent(convert(sprites.frontShiny)) {
+            loader.loadIfNeeded(sprites: sprites, of: .frontShiny)
+        }
+        if !appendedIfPresent(convert(sprites.frontFemale)) {
+            loader.loadIfNeeded(sprites: sprites, of: .frontFemale)
+        }
+        if !appendedIfPresent(convert(sprites.frontShinyFemale)) {
+            loader.loadIfNeeded(sprites: sprites, of: .frontShinyFemale)
+        }
+        if !appendedIfPresent(convert(sprites.backDefault)) {
+            loader.loadIfNeeded(sprites: sprites, of: .backDefault)
+        }
+        if !appendedIfPresent(convert(sprites.backShiny)) {
+            loader.loadIfNeeded(sprites: sprites, of: .backShiny)
+        }
+        if !appendedIfPresent(convert(sprites.backFemale)) {
+            loader.loadIfNeeded(sprites: sprites, of: .backFemale)
+        }
+        if !appendedIfPresent(convert(sprites.backShinyFemale)) {
+            loader.loadIfNeeded(sprites: sprites, of: .backShinyFemale)
+        }
     }
 
     func stopLoadImages() {
