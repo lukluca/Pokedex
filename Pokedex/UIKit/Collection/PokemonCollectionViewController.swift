@@ -154,8 +154,6 @@ extension PokemonCollectionViewController: UICollectionViewDataSourcePrefetching
     }
 
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        print("cancelPrefetchingForItemsAt")
-        print(indexPaths)
         viewModel.cancelGetMorePokemonsIfNeeded(at: indexPaths)
     }
 }

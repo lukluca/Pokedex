@@ -312,15 +312,39 @@ class RemotePokemonCatcher: PokemonCatcher {
         pagesOnDownload.contains(index)
     }
 
-    func stopTask(for index: Int) {
+    func stopTask(pageSize: Int, for index: Int) {
         guard taskOngoing(for: index) else {
             return
         }
         pokemonAPI.session.getAllTasks { tasks in
-            tasks.forEach { (task: URLSessionTask) -> () in
-                print(task.currentRequest?.url as Any)
-                //Example of url
+            tasks.forEach { [weak self] (task: URLSessionTask) -> () in
+                guard let self = self else {
+                    return
+                }
+                guard let absoluteStringURL = task.currentRequest?.url?.absoluteString else {
+                    return
+                }
+
+                let baseURL = self.pokemonAPI.utilityService.baseURL + "/pokemon/"
+                if let range = absoluteStringURL.range(of: baseURL) {
+                    let substring = absoluteStringURL[range.upperBound..<absoluteStringURL.endIndex]
+                    guard let num = substring.components(separatedBy: "/").first, let pokemonId = Int(num) else {
+                        return
+                    }
+
+                    let page = self.pageNumber(pageSize: pageSize, for: pokemonId)
+
+                    guard page == index else {
+                        return
+                    }
+
+                    task.cancel()
+                }
             }
         }
+    }
+
+    private func pageNumber(pageSize: Int, for item: Int) -> Int {
+        Int(floor(Double(item) / Double(pageSize)))
     }
 }

@@ -220,30 +220,39 @@ class CollectionViewModelTests: XCTestCase {
 
     func testStopsTaskOfPagesThatContainsIndexes() {
         let spy = PokemonCatcherSpy()
-        let sut = makeSUT(pageSize: 20, catcher: spy)
+        let pageSize = 20
+        let sut = makeSUT(pageSize: pageSize, catcher: spy)
 
         sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 3, section: 0)])
 
         XCTAssertEqual(spy.stopTaskInvocations.count, 1)
-        XCTAssertEqual(spy.stopTaskInvocations.first, 0)
+        XCTAssertEqual(spy.stopTaskInvocations.first?.index, 0)
+        XCTAssertEqual(spy.stopTaskInvocations.first?.pageSize, pageSize)
 
         sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 70, section: 0)])
 
         XCTAssertEqual(spy.stopTaskInvocations.count, 2)
-        XCTAssertEqual(spy.stopTaskInvocations.last, 3)
+        XCTAssertEqual(spy.stopTaskInvocations.last?.index, 3)
+        XCTAssertEqual(spy.stopTaskInvocations.last?.pageSize, pageSize)
 
         sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 10, section: 0), IndexPath(item: 120, section: 0)])
 
+
         XCTAssertEqual(spy.stopTaskInvocations.count, 4)
-        XCTAssertEqual(spy.stopTaskInvocations.first, 0)
-        XCTAssertEqual(spy.stopTaskInvocations[1], 3)
-        XCTAssertEqual(spy.stopTaskInvocations[2], 0)
-        XCTAssertEqual(spy.stopTaskInvocations.last, 6)
+        XCTAssertEqual(spy.stopTaskInvocations.first?.index, 0)
+        XCTAssertEqual(spy.stopTaskInvocations.first?.pageSize, pageSize)
+        XCTAssertEqual(spy.stopTaskInvocations[1].index, 3)
+        XCTAssertEqual(spy.stopTaskInvocations[1].pageSize, pageSize)
+        let set = Set(arrayLiteral: spy.stopTaskInvocations[2].index, spy.stopTaskInvocations[3].index)
+        XCTAssertEqual(set, Set(arrayLiteral: 0, 6))
+        XCTAssertEqual(spy.stopTaskInvocations[2].pageSize, pageSize)
+        XCTAssertEqual(spy.stopTaskInvocations.last?.pageSize, pageSize)
 
         sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 10, section: 0), IndexPath(item: 10, section: 0)])
 
         XCTAssertEqual(spy.stopTaskInvocations.count, 5)
-        XCTAssertEqual(spy.stopTaskInvocations.last, 0)
+        XCTAssertEqual(spy.stopTaskInvocations.last?.index, 0)
+        XCTAssertEqual(spy.stopTaskInvocations.last?.pageSize, pageSize)
     }
 
     //MARK: Helpers

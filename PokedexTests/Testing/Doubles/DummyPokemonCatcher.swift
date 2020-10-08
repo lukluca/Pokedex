@@ -17,5 +17,5 @@ class DummyPokemonCatcher: PokemonCatcher {
         false
     }
 
-    func stopTask(for index: Int) {}
+    func stopTask(pageSize: Int, for index: Int) {}
 }

@@ -117,7 +117,7 @@ class CollectionViewModel {
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
         Set(pagesFrom(indexPaths: indexPaths)).forEach { (page: Int) -> () in
-            catcher.stopTask(for: page)
+            catcher.stopTask(pageSize: pageSize, for: page)
         }
     }
 }

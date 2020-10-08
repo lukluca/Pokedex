@@ -110,7 +110,7 @@ class DBPokemonCatcher: PokemonCatcher {
         nextHandler.taskOngoing(for: index)
     }
 
-    func stopTask(for index: Int) {
-        nextHandler.stopTask(for: index)
+    func stopTask(pageSize: Int, for index: Int) {
+        nextHandler.stopTask(pageSize: pageSize, for: index)
     }
 }

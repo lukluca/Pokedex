@@ -14,5 +14,5 @@ protocol PokemonCatcher {
 
     func taskOngoing(for index: Int) -> Bool
 
-    func stopTask(for index: Int)
+    func stopTask(pageSize: Int, for index: Int)
 }
