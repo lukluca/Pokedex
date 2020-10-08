@@ -64,18 +64,25 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertNotNil(sut.scrollView)
     }
 
-    func testScrollViewHasCollectionViewAsSubview() {
+    func testScrollViewHasOnlyOneSubview() {
         let sut = makeSUT()
 
-        XCTAssertNotNil(sut.scrollView?.collectionView)
+        XCTAssertEqual(sut.scrollView?.subviews.count, 1)
+        XCTAssertNotNil(sut.scrollView?.containerView)
     }
 
-    
+    func testContainerViewOfScrollViewHasACollectionViewAndAStackView() {
+        let sut = makeSUT()
+
+        XCTAssertNotNil(sut.scrollView?.containerView?.collectionView)
+        XCTAssertNotNil(sut.scrollView?.containerView?.stackView)
+    }
+
     func testRegisterImageCell() throws {
         try skipIfVersionBelow(iOS11, "For some reason on iOS 11 the dequeueReusableCell causes a crash of the test suite.")
 
         let sut = makeSUT()
-        let cell = sut.scrollView?.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
+        let cell = sut.scrollView?.containerView?.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
 
         XCTAssertNotNil(cell, "The ImageCell must be registered")
     }
@@ -83,9 +90,11 @@ class DetailViewControllerTests: XCTestCase {
     func testConfiguresCollection() {
         let sut = makeSUT()
 
-        XCTAssertEqual(sut.scrollView?.collectionView?.backgroundColor, .clear)
-        XCTAssertEqual(sut.scrollView?.collectionView?.contentInsetAdjustmentBehavior, .always)
-        let dataSource = sut.scrollView?.collectionView?.dataSource as? DetailViewController
+        let collectionView = sut.scrollView?.containerView?.collectionView
+
+        XCTAssertEqual(collectionView?.backgroundColor, .clear)
+        XCTAssertEqual(collectionView?.contentInsetAdjustmentBehavior, .always)
+        let dataSource = collectionView?.dataSource as? DetailViewController
         XCTAssertEqual(dataSource, sut, "Missing set dataSource delegate")
     }
 
@@ -95,7 +104,7 @@ class DetailViewControllerTests: XCTestCase {
 
         let sut = makeSUT(viewModel: viewModel)
 
-        guard let collectionView = sut.scrollView?.collectionView else {
+        guard let collectionView = sut.scrollView?.containerView?.collectionView else {
             throw DetailViewControllerTestsError.missingRequiredCollection
         }
 
@@ -150,7 +159,13 @@ class DetailViewControllerTests: XCTestCase {
 
     private func makeSUT(title: String) -> DetailViewController {
         let sprites = SpritesFixture().makeSprites()
-        let vm = DetailViewModel(title: title, sprites: sprites, loader: DummySpritesLoader())
+        let vm = DetailViewModel(number: "",
+                title: title,
+                baseExperience: "",
+                height: "",
+                weight: "",
+                sprites: sprites,
+                loader: DummySpritesLoader())
         return makeSUT(viewModel: vm)
     }
 
@@ -177,15 +192,31 @@ private extension DetailViewController {
 }
 
 private extension UIScrollView {
+    var containerView: UIView? {
+        subviews.first
+    }
+}
+
+private extension UIView {
     var collectionView: UICollectionView? {
         subviews.first{ $0 is UICollectionView } as? UICollectionView
+    }
+
+    var stackView: UIStackView? {
+        subviews.first{ $0 is UIStackView } as? UIStackView
     }
 }
 
 private class DummyDetailViewModel: DetailViewModel {
 
     init() {
-        super.init(title: "", sprites: SpritesFixture().makeSprites(), loader: DummySpritesLoader())
+        super.init(number: "",
+                title: "",
+                baseExperience: "",
+                height: "",
+                weight: "",
+                sprites: SpritesFixture().makeSprites(),
+                loader: DummySpritesLoader())
     }
 
     override func numberOfItems(in section: Int) -> Int {

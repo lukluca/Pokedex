@@ -55,13 +55,19 @@ class DetailViewController: UIViewController {
 
     private func addCustomSubviews() {
         addCloseButton()
+
         let label = makeTitleLabel()
         addTitleLabel(label)
+
         let scroll = UIScrollView()
-        addScrollView(scroll, below: label)
+        let scrollContent = UIView()
+        addScrollView(scroll, contentView: scrollContent, below: label)
+
         let collection = makeCollectionView()
-        addCollectionView(collection, inside: scroll)
+        addCollectionView(collection, inside: scrollContent)
         configureCollectionView(collection)
+
+        addStackView(inside: scrollContent, below: collection)
 
         self.collectionView = collection
     }
@@ -84,9 +90,8 @@ class DetailViewController: UIViewController {
     }
 
     private func makeTitleLabel() -> UILabel {
-        let label = UILabel()
+        let label = makeLabel(with: viewModel.title)
         label.textAlignment = .center
-        label.text = viewModel.title
         return label
     }
 
@@ -101,7 +106,17 @@ class DetailViewController: UIViewController {
         NSLayoutConstraint.activate(constraints)
     }
 
-    private func addScrollView(_ scroll: UIScrollView, below otherView: UIView) {
+    private func addScrollView(_ scroll: UIScrollView, contentView: UIView, below otherView: UIView) {
+        scroll.addSubview(contentView)
+
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        let contentGuide = scroll.contentLayoutGuide
+        let contentConstraints = [contentView.topAnchor.constraint(equalTo: contentGuide.topAnchor),
+                                  contentView.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor),
+                                  contentView.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor),
+                                  contentView.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor)]
+        NSLayoutConstraint.activate(contentConstraints)
+
         view.addSubview(scroll)
 
         scroll.translatesAutoresizingMaskIntoConstraints = false
@@ -118,12 +133,12 @@ class DetailViewController: UIViewController {
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }
 
-    private func addCollectionView(_ collection: UICollectionView, inside scroll: UIScrollView) {
-        scroll.addSubview(collection)
+    private func addCollectionView(_ collection: UICollectionView, inside container: UIView) {
+        container.addSubview(collection)
 
         collection.translatesAutoresizingMaskIntoConstraints = false
         let guide = view.safeAreaLayoutGuide
-        let constraints = [collection.topAnchor.constraint(equalTo: scroll.topAnchor),
+        let constraints = [collection.topAnchor.constraint(equalTo: container.topAnchor),
                            collection.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: .margin),
                            collection.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -.margin),
                            collection.heightAnchor.constraint(equalToConstant: 200)]
@@ -135,6 +150,40 @@ class DetailViewController: UIViewController {
         collection.dataSource = self
         collection.contentInsetAdjustmentBehavior = .always
         collection.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+    }
+
+    private func addStackView(inside container: UIView, below otherView: UIView) {
+        let stack = UIStackView()
+
+        stack.axis = .vertical
+        stack.spacing = 5
+        stack.alignment = .center
+
+        let numberLabel = makeLabel(with: "Number: " + viewModel.number)
+        let baseExperienceLabel = makeLabel(with: "Base Experience: " + viewModel.baseExperience)
+        let heightLabel = makeLabel(with: "Height: " + viewModel.height)
+        let weightLabel = makeLabel(with: "Weight: " + viewModel.weight)
+
+        stack.addArrangedSubview(numberLabel)
+        stack.addArrangedSubview(baseExperienceLabel)
+        stack.addArrangedSubview(heightLabel)
+        stack.addArrangedSubview(weightLabel)
+
+        container.addSubview(stack)
+
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        let guide = view.safeAreaLayoutGuide
+        let constraints = [stack.topAnchor.constraint(equalTo: otherView.bottomAnchor, constant: .margin),
+                           stack.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: .margin),
+                           stack.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -.margin),
+                           stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: .margin)]
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    private func makeLabel(with text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        return label
     }
 
     @objc func closeAction(sender: UIButton) {

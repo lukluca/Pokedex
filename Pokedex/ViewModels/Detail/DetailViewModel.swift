@@ -8,13 +8,29 @@
 import UIKit
 
 class DetailViewModel {
+    let number: String
     let title: String
-    private var collection = [DetailCellViewModel]()
+    let baseExperience: String
+    let height: String
+    let weight: String
     private let sprites: Sprites
+
     private let loader: SpritesLoader
 
-    init(title: String, sprites: Sprites, loader: SpritesLoader) {
+    private var collection = [DetailCellViewModel]()
+
+    init(number: String,
+         title: String,
+         baseExperience: String,
+         height: String,
+         weight: String,
+         sprites: Sprites,
+         loader: SpritesLoader) {
+        self.number = number
         self.title = title
+        self.baseExperience = baseExperience
+        self.height = height
+        self.weight = weight
         self.sprites = sprites
         self.loader = loader
     }

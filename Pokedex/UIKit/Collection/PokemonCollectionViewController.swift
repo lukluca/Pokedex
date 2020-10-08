@@ -104,7 +104,7 @@ class PokemonCollectionViewController: UICollectionViewController {
             return
         }
 
-        let viewController = DetailViewControllerFactory().make(id: pokemon.id, title: itemVM.text, sprites: pokemon.sprites)
+        let viewController = DetailViewControllerFactory().make(id: pokemon.id, title: itemVM.text, sprites: pokemon.sprites, details: pokemon.details)
         present(viewController, animated: true)
     }
 

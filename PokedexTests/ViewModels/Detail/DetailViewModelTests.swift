@@ -100,17 +100,29 @@ class DetailViewModelTests: XCTestCase {
     private func makeSUT(frontDefaultData: Data,
                          frontShinyData: Data? = nil) -> DetailViewModel {
         let sprites = SpritesFixture().makeSprites(frontDefaultData: frontDefaultData, frontShinyData: frontShinyData)
-        return DetailViewModel(title: "", sprites: sprites, loader: DummySpritesLoader())
+        return makeSUT(sprites: sprites)
     }
 
     private func makeSUT(loader: SpritesLoader = DummySpritesLoader()) -> DetailViewModel {
         let sprites = SpritesFixture().makeSprites()
-        return DetailViewModel(title: "", sprites: sprites, loader: loader)
+        return DetailViewModel(number: "",
+                title: "",
+                baseExperience: "",
+                height: "",
+                weight: "",
+                sprites: sprites,
+                loader: loader)
     }
 
     private func makeSUT(sprites: Sprites,
                          loader: SpritesLoader = DummySpritesLoader()) -> DetailViewModel {
-        DetailViewModel(title: "", sprites: sprites, loader: loader)
+        return DetailViewModel(number: "",
+                title: "",
+                baseExperience: "",
+                height: "",
+                weight: "",
+                sprites: sprites,
+                loader: loader)
     }
 }
 
