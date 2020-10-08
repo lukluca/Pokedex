@@ -55,9 +55,12 @@ class DetailViewController: UIViewController {
 
     private func addCustomSubviews() {
         addCloseButton()
-        addTitleLabel()
+        let label = makeTitleLabel()
+        addTitleLabel(label)
+        let scroll = UIScrollView()
+        addScrollView(scroll, below: label)
         let collection = makeCollectionView()
-        addCollectionView(collection)
+        addCollectionView(collection, inside: scroll)
         configureCollectionView(collection)
 
         self.collectionView = collection
@@ -73,25 +76,40 @@ class DetailViewController: UIViewController {
 
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         let guide = view.safeAreaLayoutGuide
-        let constraints = [closeButton.topAnchor.constraint(equalTo: guide.topAnchor, constant: 30),
+        let constraints = [closeButton.topAnchor.constraint(equalTo: guide.topAnchor, constant: .margin),
                            closeButton.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20),
                            closeButton.heightAnchor.constraint(equalToConstant: 44),
                            closeButton.widthAnchor.constraint(equalTo: closeButton.heightAnchor)]
         NSLayoutConstraint.activate(constraints)
     }
 
-    private func addTitleLabel() {
+    private func makeTitleLabel() -> UILabel {
         let label = UILabel()
-        label.text = viewModel.title
-        view.addSubview(label)
-
         label.textAlignment = .center
+        label.text = viewModel.title
+        return label
+    }
+
+    private func addTitleLabel(_ label: UILabel) {
+        view.addSubview(label)
 
         label.translatesAutoresizingMaskIntoConstraints = false
         let guide = view.safeAreaLayoutGuide
         let constraints = [label.topAnchor.constraint(equalTo: guide.topAnchor, constant: 80),
-                           label.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 30),
-                           label.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -30)]
+                           label.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: .margin),
+                           label.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -.margin)]
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    private func addScrollView(_ scroll: UIScrollView, below otherView: UIView) {
+        view.addSubview(scroll)
+
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        let guide = view.safeAreaLayoutGuide
+        let constraints = [scroll.topAnchor.constraint(equalTo: otherView.bottomAnchor, constant: .margin),
+                           scroll.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: .margin),
+                           scroll.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -.margin),
+                           scroll.bottomAnchor.constraint(equalTo: guide.bottomAnchor, constant: .margin)]
         NSLayoutConstraint.activate(constraints)
     }
 
@@ -100,14 +118,14 @@ class DetailViewController: UIViewController {
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }
 
-    private func addCollectionView(_ collection: UICollectionView) {
-        view.addSubview(collection)
+    private func addCollectionView(_ collection: UICollectionView, inside scroll: UIScrollView) {
+        scroll.addSubview(collection)
 
         collection.translatesAutoresizingMaskIntoConstraints = false
         let guide = view.safeAreaLayoutGuide
-        let constraints = [collection.topAnchor.constraint(equalTo: guide.topAnchor, constant: 150),
-                           collection.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 30),
-                           collection.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -30),
+        let constraints = [collection.topAnchor.constraint(equalTo: scroll.topAnchor),
+                           collection.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: .margin),
+                           collection.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -.margin),
                            collection.heightAnchor.constraint(equalToConstant: 200)]
         NSLayoutConstraint.activate(constraints)
     }
@@ -141,4 +159,8 @@ extension DetailViewController: UICollectionViewDataSource {
         imageCell.image = cellViewModel.image
         return imageCell
     }
+}
+
+private extension CGFloat {
+    static let margin: CGFloat = 30
 }

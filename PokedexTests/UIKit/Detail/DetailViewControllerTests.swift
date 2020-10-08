@@ -58,17 +58,24 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertEqual(titleLabel?.textAlignment, .center)
     }
 
-    func testDoesHaveACollectionView() {
+    func testDoesHaveAScrollView() {
         let sut = makeSUT()
 
-        XCTAssertNotNil(sut.collectionView)
+        XCTAssertNotNil(sut.scrollView)
     }
 
+    func testScrollViewHasCollectionViewAsSubview() {
+        let sut = makeSUT()
+
+        XCTAssertNotNil(sut.scrollView?.collectionView)
+    }
+
+    
     func testRegisterImageCell() throws {
         try skipIfVersionBelow(iOS11, "For some reason on iOS 11 the dequeueReusableCell causes a crash of the test suite.")
 
         let sut = makeSUT()
-        let cell = sut.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
+        let cell = sut.scrollView?.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
 
         XCTAssertNotNil(cell, "The ImageCell must be registered")
     }
@@ -76,9 +83,9 @@ class DetailViewControllerTests: XCTestCase {
     func testConfiguresCollection() {
         let sut = makeSUT()
 
-        XCTAssertEqual(sut.collectionView?.backgroundColor, .clear)
-        XCTAssertEqual(sut.collectionView?.contentInsetAdjustmentBehavior, .always)
-        let dataSource = sut.collectionView?.dataSource as? DetailViewController
+        XCTAssertEqual(sut.scrollView?.collectionView?.backgroundColor, .clear)
+        XCTAssertEqual(sut.scrollView?.collectionView?.contentInsetAdjustmentBehavior, .always)
+        let dataSource = sut.scrollView?.collectionView?.dataSource as? DetailViewController
         XCTAssertEqual(dataSource, sut, "Missing set dataSource delegate")
     }
 
@@ -88,7 +95,7 @@ class DetailViewControllerTests: XCTestCase {
 
         let sut = makeSUT(viewModel: viewModel)
 
-        guard let collectionView = sut.collectionView else {
+        guard let collectionView = sut.scrollView?.collectionView else {
             throw DetailViewControllerTestsError.missingRequiredCollection
         }
 
@@ -164,8 +171,14 @@ private extension DetailViewController {
         view.subviews.first{ $0 is UILabel } as? UILabel
     }
 
+    var scrollView: UIScrollView? {
+        view.subviews.first{ $0 is UIScrollView } as? UIScrollView
+    }
+}
+
+private extension UIScrollView {
     var collectionView: UICollectionView? {
-        view.subviews.first{ $0 is UICollectionView } as? UICollectionView
+        subviews.first{ $0 is UICollectionView } as? UICollectionView
     }
 }
 
