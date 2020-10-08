@@ -11,6 +11,13 @@ struct Pokemon {
     let id: Int
     let name: String
     let sprites: Sprites
+    let details: Details
+}
+
+struct Details {
+    let baseExperience: Int
+    let height: Int
+    let weight: Int
 }
 
 struct Sprites {

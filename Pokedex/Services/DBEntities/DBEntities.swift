@@ -15,6 +15,7 @@ class DBPokemon: Object {
     @objc dynamic var id = 0
     @objc dynamic var name = ""
     @objc dynamic var sprites: DBSprites! = DBSprites()
+    @objc dynamic var details: DBDetails! = DBDetails()
 
     override static func primaryKey() -> String? {
         "id"
@@ -43,4 +44,10 @@ class DBDefaultImage: Object {
 
 class DBPokedex: Object {
     @objc dynamic var totalPokemonCount = 0
+}
+
+class DBDetails: Object {
+    @objc dynamic var baseExperience: Int = 0
+    @objc dynamic var height: Int = 0
+    @objc dynamic var weight: Int = 0
 }

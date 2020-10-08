@@ -51,6 +51,7 @@ class DBPokemonSaver {
         pkm.id = resource.id
         pkm.name = resource.name
         pkm.sprites = convert(resource.sprites)
+        pkm.details = convert(resource.details)
         return pkm
     }
 
@@ -81,5 +82,13 @@ class DBPokemonSaver {
         image.data = res.data
         image.url = res.url.absoluteString
         return image
+    }
+
+    private func convert(_ resource: Details) -> DBDetails {
+        let details = DBDetails()
+        details.baseExperience = resource.baseExperience
+        details.height = resource.height
+        details.weight = resource.weight
+        return details
     }
 }

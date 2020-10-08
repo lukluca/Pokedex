@@ -20,6 +20,7 @@ struct RemotePokemon {
     let id: Int?
     let name: String?
     let sprites: RemoteSprites?
+    let details: RemoteDetails
 }
 
 struct RemoteSprites {
@@ -31,6 +32,12 @@ struct RemoteSprites {
     let backShiny: String?
     let backFemale: String?
     let backShinyFemale: String?
+}
+
+struct RemoteDetails {
+    let baseExperience: Int?
+    let height: Int?
+    let weight: Int?
 }
 
 
@@ -252,7 +259,7 @@ class RemotePokemonCatcher: PokemonCatcher {
         } else {
             arrayId = nil
         }
-        return RemotePokemon(id: arrayId, name: resource.name, sprites: convert(resource.sprites))
+        return RemotePokemon(id: arrayId, name: resource.name, sprites: convert(resource.sprites), details: convert(resource))
     }
 
     private func convert(_ sprites: PKMPokemonSprites?) -> RemoteSprites? {
@@ -269,15 +276,20 @@ class RemotePokemonCatcher: PokemonCatcher {
                 backShinyFemale: sprites.backShinyFemale)
     }
 
+    private func convert(_ resource: PKMPokemon) -> RemoteDetails {
+        RemoteDetails(baseExperience: resource.baseExperience, height: resource.height, weight: resource.weight)
+    }
+
     private func convert(_ resource: RemotePokemon, data: Data?) -> Pokemon? {
         guard let id = resource.id,
               let name = resource.name,
               let sprites = resource.sprites,
+              let details = convert(resource.details),
               let data = data else {
             return nil
         }
 
-        return Pokemon(id: id, name: name, sprites: convert(sprites, defaultData: data))
+        return Pokemon(id: id, name: name, sprites: convert(sprites, defaultData: data), details: details)
     }
 
     private func convert(_ resource: RemoteSprites, defaultData: Data) -> Sprites {
@@ -301,6 +313,16 @@ class RemotePokemonCatcher: PokemonCatcher {
         }
 
         return Image(data: nil, url: url)
+    }
+
+    private func convert(_ resource: RemoteDetails) -> Details? {
+        guard let baseExperience = resource.baseExperience,
+              let height = resource.height,
+              let weight = resource.weight else {
+            return nil
+        }
+
+        return Details(baseExperience: baseExperience, height: height, weight: weight)
     }
 
     @discardableResult

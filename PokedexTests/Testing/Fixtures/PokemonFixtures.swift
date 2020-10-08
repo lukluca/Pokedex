@@ -12,7 +12,8 @@ class PokemonFixture {
 
     func makePokemon(id: Int, name: String, frontDefaultData: Data = Data(), frontShinyData: Data? = nil) -> Pokemon {
         let sprites = SpritesFixture().makeSprites(frontDefaultData: frontDefaultData)
-        return Pokemon(id: id, name: name, sprites: sprites)
+        let details = DetailsFixture().make()
+        return Pokemon(id: id, name: name, sprites: sprites, details: details)
     }
 }
 
@@ -49,5 +50,11 @@ class ImageFixture {
 
     func makeImage(data: Data?, url: URL) -> Image {
         Image(data: data, url: url)
+    }
+}
+
+class DetailsFixture {
+    func make() -> Details {
+        Details(baseExperience: 0, height: 0, weight: 0)
     }
 }

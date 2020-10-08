@@ -50,7 +50,7 @@ class DBPokemonCatcher: PokemonCatcher {
     }
 
     private func convert(_ entity: DBPokemon) -> Pokemon {
-        Pokemon(id: entity.id, name: entity.name, sprites: convert(entity.sprites))
+        Pokemon(id: entity.id, name: entity.name, sprites: convert(entity.sprites), details: convert(entity.details))
     }
 
     private func convert(_ entity: DBSprites) -> Sprites {
@@ -73,6 +73,10 @@ class DBPokemonCatcher: PokemonCatcher {
             return nil
         }
         return Image(data: entity?.data, url: url)
+    }
+
+    private func convert(_ entity: DBDetails) -> Details {
+        Details(baseExperience: entity.baseExperience, height: entity.height, weight: entity.weight)
     }
 
     func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void) {
