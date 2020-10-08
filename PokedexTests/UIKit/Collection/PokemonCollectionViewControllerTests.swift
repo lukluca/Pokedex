@@ -10,7 +10,9 @@ import XCTest
 
 class PokemonCollectionViewControllerTests: XCTestCase  {
 
-    func testRegisterPokemonCell() {
+    func testRegisterPokemonCell() throws {
+        try skipIfVersionBelow(iOS11, "For some reason on iOS 11 the dequeueReusableCell causes a crash of the test suite.")
+
         let sut = makeSUT()
         let cell = sut.collectionView.dequeueReusableCell(withReuseIdentifier: "PokemonCell", for: firstIndexPath) as? PokemonCollectionViewCell
 

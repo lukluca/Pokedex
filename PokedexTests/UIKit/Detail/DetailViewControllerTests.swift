@@ -75,7 +75,9 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertNotNil(sut.collectionView)
     }
 
-    func testRegisterImageCell() {
+    func testRegisterImageCell() throws {
+        try skipIfVersionBelow(iOS11, "For some reason on iOS 11 the dequeueReusableCell causes a crash of the test suite.")
+
         let sut = makeSUT()
         let cell = sut.collectionView?.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: firstIndexPath) as? ImageCollectionViewCell
 
