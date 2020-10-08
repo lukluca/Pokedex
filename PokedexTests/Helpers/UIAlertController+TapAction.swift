@@ -1,5 +1,5 @@
 //
-//  PokemonCollectionViewControllerTests.swift
+//  UIAlertController+TapAction.swift
 //  PokedexTests
 //
 //  Created by Luca Tagliabue on 3/10/2020.

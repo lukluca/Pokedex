@@ -1,5 +1,5 @@
 //
-//  XCTestCase+DummyError.swift
+//  XCTestCase+AvailableVersion.swift
 //  PokedexTests
 //
 //  Created by Luca Tagliabue on 6/10/2020.

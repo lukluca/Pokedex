@@ -119,11 +119,11 @@ class DetailViewControllerTests: XCTestCase {
         XCTAssertEqual(spy.startLoadImagesInvocationsCount, 1, "Missing start load image")
     }
 
-    func testOnViewDidLoadAttachesToViewModelUpdates() {
+    func testOnViewWillAppearAttachesToViewModelUpdates() {
         let spy = DetailViewModelSpy()
         let sut = makeSUT(viewModel: spy)
 
-        sut.loadViewIfNeeded()
+        sut.viewWillAppear(false)
 
         XCTAssertNotNil(spy.onItemAdded, "Missing attach to view model update")
     }
@@ -152,7 +152,7 @@ class DetailViewControllerTests: XCTestCase {
 
     private func makeSUT(title: String) -> DetailViewController {
         let sprites = SpritesFixture().makeSprites()
-        let vm = DetailViewModel(title: title, sprites: sprites, downloader: DummyDataDownloader())
+        let vm = DetailViewModel(title: title, sprites: sprites, loader: DummySpritesLoader())
         return makeSUT(viewModel: vm)
     }
 
@@ -181,7 +181,7 @@ private extension DetailViewController {
 private class DummyDetailViewModel: DetailViewModel {
 
     init() {
-        super.init(title: "", sprites: SpritesFixture().makeSprites(), downloader: DummyDataDownloader())
+        super.init(title: "", sprites: SpritesFixture().makeSprites(), loader: DummySpritesLoader())
     }
 
     override func numberOfItems(in section: Int) -> Int {
