@@ -41,6 +41,8 @@ class PokemonCollectionViewCell: UICollectionViewCell {
         view.accessibilityIdentifier = "nameLabel"
         view.translatesAutoresizingMaskIntoConstraints = false
         view.textAlignment = .center
+        
+        view.setContentCompressionResistancePriority(.required, for: .vertical)
         return view
     }()
     
