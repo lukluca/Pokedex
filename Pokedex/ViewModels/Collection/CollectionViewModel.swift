@@ -70,7 +70,7 @@ class CollectionViewModel {
         let uniquePageNumbers = Set(pagesFromIndexPaths)
 
         let pagesWithoutATask = uniquePageNumbers.filter { page -> Bool in
-            !catcher.taskOngoingFor(for: page)
+            !catcher.taskOngoing(for: page)
         }
 
         let indexPathsWithoutAnItem = indexPaths.filter { path -> Bool in
@@ -116,5 +116,8 @@ class CollectionViewModel {
     }
 
     func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
+        Set(pagesFrom(indexPaths: indexPaths)).forEach { (page: Int) -> () in
+            catcher.stopTask(for: page)
+        }
     }
 }

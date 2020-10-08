@@ -12,5 +12,7 @@ protocol PokemonCatcher {
     func firstPage(pageSize: Int, completion: @escaping (Result<PokemonList, Error>) -> Void)
     func page(pageSize: Int, number: Int, completion: @escaping (Result<[Pokemon], Error>) -> Void)
 
-    func taskOngoingFor(for index: Int) -> Bool
+    func taskOngoing(for index: Int) -> Bool
+
+    func stopTask(for index: Int)
 }

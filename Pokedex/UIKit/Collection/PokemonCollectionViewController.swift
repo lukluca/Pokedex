@@ -38,6 +38,7 @@ class PokemonCollectionViewController: UICollectionViewController {
 
         collectionView.contentInsetAdjustmentBehavior = .always
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        collectionView.isPrefetchingEnabled = true
 
         getPokemons()
 
@@ -153,6 +154,8 @@ extension PokemonCollectionViewController: UICollectionViewDataSourcePrefetching
     }
 
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        print("cancelPrefetchingForItemsAt")
+        print(indexPaths)
         viewModel.cancelGetMorePokemonsIfNeeded(at: indexPaths)
     }
 }

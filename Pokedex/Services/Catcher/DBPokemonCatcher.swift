@@ -106,7 +106,11 @@ class DBPokemonCatcher: PokemonCatcher {
         return Array(entitiesInsidePage)
     }
 
-    func taskOngoingFor(for index: Int) -> Bool {
-        nextHandler.taskOngoingFor(for: index)
+    func taskOngoing(for index: Int) -> Bool {
+        nextHandler.taskOngoing(for: index)
+    }
+
+    func stopTask(for index: Int) {
+        nextHandler.stopTask(for: index)
     }
 }

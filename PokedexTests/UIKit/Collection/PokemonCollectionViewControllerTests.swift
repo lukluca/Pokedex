@@ -135,8 +135,8 @@ class PokemonCollectionViewControllerTests: XCTestCase  {
 
         sut.collectionView(sut.collectionView, cancelPrefetchingForItemsAt: indexPaths)
 
-        XCTAssertEqual(spy.cancelMorePokemonsIfNeededInvocations.count, 1, "The collection cancelled more Pokemon request!")
-        XCTAssertEqual(spy.cancelMorePokemonsIfNeededInvocations.first, indexPaths)
+        XCTAssertEqual(spy.cancelGetMorePokemonsIfNeededInvocations.count, 1, "The collection cancelled more Pokemon request!")
+        XCTAssertEqual(spy.cancelGetMorePokemonsIfNeededInvocations.first, indexPaths)
     }
 
     func testIfUserPressesACellWithoutADataThePressHasNotEffect() {
@@ -229,7 +229,7 @@ private class CollectionViewModelSpy: CollectionViewModel {
 
     private(set) var getPokemonsInvocations = [(Result<(), Error>) -> ()]()
     private(set) var getMorePokemonsIfNeededInvocations = [[IndexPath]]()
-    private(set) var cancelMorePokemonsIfNeededInvocations = [[IndexPath]]()
+    private(set) var cancelGetMorePokemonsIfNeededInvocations = [[IndexPath]]()
 
     init() {
         super.init(pageSize: 50, catcher: DummyPokemonCatcher())
@@ -244,7 +244,7 @@ private class CollectionViewModelSpy: CollectionViewModel {
     }
 
     override func cancelGetMorePokemonsIfNeeded(at indexPaths: [IndexPath]) {
-        cancelMorePokemonsIfNeededInvocations.append(indexPaths)
+        cancelGetMorePokemonsIfNeededInvocations.append(indexPaths)
     }
 }
 

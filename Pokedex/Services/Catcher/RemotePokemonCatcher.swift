@@ -84,7 +84,7 @@ class RemotePokemonCatcher: PokemonCatcher {
             return
         }
         pagesOnDownload.insert(number)
-        pageFromAPI(pageNumber: number) { [weak self] result in
+        pageFromAPI(pageSize: pageSize, pageNumber: number) { [weak self] result in
             guard let self = self else {
                 return
             }
@@ -147,13 +147,52 @@ class RemotePokemonCatcher: PokemonCatcher {
         fetchPokemonList(paginationState: state, withEventualError: .firstPokemons, completion: completion)
     }
 
-    private func pageFromAPI(pageNumber: Int, completion: @escaping PageCompletion) {
-        guard let page = pagedObject else {
-            completion(Result.failure(RemoteError.nextPagePokemons))
-            return
+    private func pageFromAPI(pageSize: Int, pageNumber: Int, completion: @escaping PageCompletion) {
+        if let object = pagedObject {
+            let state = PaginationState<PKMPokemon>.continuing(object, .page(pageNumber))
+            fetchPokemonList(paginationState: state, withEventualError: .nextPagePokemons, completion: completion)
+        } else {
+            firstPageFromAPIWithoutResources(pageSize: pageSize) { [weak self] result in
+                guard let self = self else {
+                    return
+                }
+                switch result {
+                case.success:
+                    if let object = self.pagedObject {
+                        let state = PaginationState<PKMPokemon>.continuing(object, .page(pageNumber))
+                        self.fetchPokemonList(paginationState: state, withEventualError: .nextPagePokemons, completion: completion)
+                    } else {
+                        completion(Result.failure(RemoteError.nextPagePokemons))
+                    }
+                case .failure:
+                    completion(Result.failure(RemoteError.nextPagePokemons))
+                }
+            }
         }
-        let state = PaginationState<PKMPokemon>.continuing(page, .page(pageNumber))
-        fetchPokemonList(paginationState: state, withEventualError: .nextPagePokemons, completion: completion)
+    }
+
+    //Workaround to obtain a page object
+    private func firstPageFromAPIWithoutResources(pageSize: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        let state = PaginationState<PKMPokemon>.initial(pageLimit: pageSize)
+
+        pokemonAPI.pokemonService.fetchPokemonList(paginationState: state) { [weak self] (result: Result<PKMPagedObject<PKMPokemon>, Error>) in
+            guard let self = self else {
+                return
+            }
+            switch result {
+            case .success(let page):
+                if let storedCurrentPage = self.pagedObject?.currentPage {
+                    if storedCurrentPage < page.currentPage {
+                        self.pagedObject = page
+                    }
+                } else {
+                    self.pagedObject = page
+                }
+                completion(Result.success(()))
+            case .failure(let error):
+                completion(Result.failure(error))
+            }
+        }
     }
 
     private func fetchPokemonList(paginationState: PaginationState<PKMPokemon>, withEventualError error: RemoteError, completion: @escaping PageCompletion) {
@@ -269,7 +308,19 @@ class RemotePokemonCatcher: PokemonCatcher {
         downloader.download(from: url, completion: completion)
     }
 
-    func taskOngoingFor(for index: Int) -> Bool {
+    func taskOngoing(for index: Int) -> Bool {
         pagesOnDownload.contains(index)
+    }
+
+    func stopTask(for index: Int) {
+        guard taskOngoing(for: index) else {
+            return
+        }
+        pokemonAPI.session.getAllTasks { tasks in
+            tasks.forEach { (task: URLSessionTask) -> () in
+                print(task.currentRequest?.url as Any)
+                //Example of url
+            }
+        }
     }
 }

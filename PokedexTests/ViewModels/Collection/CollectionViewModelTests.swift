@@ -218,6 +218,34 @@ class CollectionViewModelTests: XCTestCase {
         XCTAssertPokemonEqual(pokemon, expectedPokemon)
     }
 
+    func testStopsTaskOfPagesThatContainsIndexes() {
+        let spy = PokemonCatcherSpy()
+        let sut = makeSUT(pageSize: 20, catcher: spy)
+
+        sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 3, section: 0)])
+
+        XCTAssertEqual(spy.stopTaskInvocations.count, 1)
+        XCTAssertEqual(spy.stopTaskInvocations.first, 0)
+
+        sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 70, section: 0)])
+
+        XCTAssertEqual(spy.stopTaskInvocations.count, 2)
+        XCTAssertEqual(spy.stopTaskInvocations.last, 3)
+
+        sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 10, section: 0), IndexPath(item: 120, section: 0)])
+
+        XCTAssertEqual(spy.stopTaskInvocations.count, 4)
+        XCTAssertEqual(spy.stopTaskInvocations.first, 0)
+        XCTAssertEqual(spy.stopTaskInvocations[1], 3)
+        XCTAssertEqual(spy.stopTaskInvocations[2], 0)
+        XCTAssertEqual(spy.stopTaskInvocations.last, 6)
+
+        sut.cancelGetMorePokemonsIfNeeded(at: [IndexPath(item: 10, section: 0), IndexPath(item: 10, section: 0)])
+
+        XCTAssertEqual(spy.stopTaskInvocations.count, 5)
+        XCTAssertEqual(spy.stopTaskInvocations.last, 0)
+    }
+
     //MARK: Helpers
 
     private func makeSUT(pageSize: Int = 1, catcher: PokemonCatcher = DummyPokemonCatcher()) -> CollectionViewModel {
@@ -285,8 +313,8 @@ private class PokemonCatcherMock: PokemonCatcherSpy {
         self.pokemons = nil
     }
 
-    override func taskOngoingFor(for index: Int) -> Bool {
-        let _ = super.taskOngoingFor(for: index)
+    override func taskOngoing(for index: Int) -> Bool {
+        let _ = super.taskOngoing(for: index)
         return taskOngoingForIndex == index
     }
 
