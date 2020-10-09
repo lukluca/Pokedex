@@ -59,8 +59,9 @@ class DetailViewController: UIViewController {
         let label = makeTitleLabel()
         addTitleLabel(label)
 
-        let scroll = UIScrollView()
-        let scrollContent = UIView()
+        let scroll = DetailsScrollView()
+        let scrollContent = DetailsContentView()
+        
         addScrollView(scroll, contentView: scrollContent, below: label)
 
         let collection = makeCollectionView()
@@ -151,7 +152,7 @@ class DetailViewController: UIViewController {
         collection.contentInsetAdjustmentBehavior = .always
         collection.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
     }
-
+    
     private func addStackView(inside container: UIView, below otherView: UIView) {
         let stack = UIStackView()
 
@@ -213,3 +214,44 @@ extension DetailViewController: UICollectionViewDataSource {
 private extension CGFloat {
     static let margin: CGFloat = 30
 }
+
+private class DetailsScrollView: UIScrollView {
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let collection = subviews.first { $0 is UICollectionView }
+        
+        guard let collectionView = collection else {
+            return super.point(inside: point, with: event)
+        }
+        
+        let converted = self.convert(point, to: collectionView)
+        let touchedCollection = collectionView.hitTest(converted, with: event) != nil
+        
+        if touchedCollection {
+            return true
+        }
+
+        return super.point(inside: point, with: event)
+    }
+}
+
+private class DetailsContentView: UIView {
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let collection = subviews.first { $0 is UICollectionView }
+        
+        guard let collectionView = collection else {
+            return super.point(inside: point, with: event)
+        }
+        
+        let converted = self.convert(point, to: collectionView)
+        let touchedCollection = collectionView.hitTest(converted, with: event) != nil
+        
+        if touchedCollection {
+            return true
+        }
+
+        return super.point(inside: point, with: event)
+    }
+}
+
