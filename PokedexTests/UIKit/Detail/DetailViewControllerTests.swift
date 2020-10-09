@@ -74,8 +74,50 @@ class DetailViewControllerTests: XCTestCase {
     func testContainerViewOfScrollViewHasACollectionViewAndAStackView() {
         let sut = makeSUT()
 
+        XCTAssertEqual(sut.scrollView?.containerView?.subviews.count, 2)
         XCTAssertNotNil(sut.scrollView?.containerView?.collectionView)
         XCTAssertNotNil(sut.scrollView?.containerView?.stackView)
+    }
+
+    func testStackViewHasGotThreeLabelsAsArrangedSubviews() {
+        let sut = makeSUT()
+
+        let stackView = sut.scrollView?.containerView?.stackView
+
+        XCTAssertEqual(stackView?.arrangedSubviews.count, 4)
+        XCTAssertNotNil(stackView?.arrangedSubviews.first as? UILabel)
+        XCTAssertNotNil(stackView?.arrangedSubviews[1] as? UILabel)
+        XCTAssertNotNil(stackView?.arrangedSubviews[2] as? UILabel)
+        XCTAssertNotNil(stackView?.arrangedSubviews.last as? UILabel)
+    }
+
+    func testConfiguresStackView() {
+        let sut = makeSUT()
+
+        let stackView = sut.scrollView?.containerView?.stackView
+
+        XCTAssertEqual(stackView?.axis, .vertical, "Missing stack view configuration")
+        XCTAssertEqual(stackView?.spacing, 5, "Missing stack view configuration")
+        XCTAssertEqual(stackView?.alignment, .center, "Missing stack view configuration")
+    }
+
+    func testBindsStackViewLabelsWhitViewModel() {
+        let sut = makeSUT(number: "5",
+                baseExperience: "40",
+                height: "100",
+                weight: "3")
+
+        let stackView = sut.scrollView?.containerView?.stackView
+
+        let firstLabel = stackView?.arrangedSubviews.first as? UILabel
+        let secondLabel = stackView?.arrangedSubviews[1] as? UILabel
+        let thirdLabel = stackView?.arrangedSubviews[2] as? UILabel
+        let fourthLabel = stackView?.arrangedSubviews.last as? UILabel
+
+        XCTAssertEqual(firstLabel?.text, "Number: 5", "Missing stack view binding")
+        XCTAssertEqual(secondLabel?.text, "Base Experience: 40", "Missing stack view binding")
+        XCTAssertEqual(thirdLabel?.text, "Height: 100", "Missing stack view binding")
+        XCTAssertEqual(fourthLabel?.text, "Weight: 3", "Missing stack view binding")
     }
 
     func testRegisterImageCell() throws {
@@ -157,13 +199,17 @@ class DetailViewControllerTests: XCTestCase {
 
     //MARK: Helpers
 
-    private func makeSUT(title: String) -> DetailViewController {
+    private func makeSUT(number: String = "",
+                         title: String = "",
+                         baseExperience: String = "",
+                         height: String = "",
+                         weight: String = "") -> DetailViewController {
         let sprites = SpritesFixture().makeSprites()
-        let vm = DetailViewModel(number: "",
+        let vm = DetailViewModel(number: number,
                 title: title,
-                baseExperience: "",
-                height: "",
-                weight: "",
+                baseExperience: baseExperience,
+                height: height,
+                weight: weight,
                 sprites: sprites,
                 loader: DummySpritesLoader())
         return makeSUT(viewModel: vm)

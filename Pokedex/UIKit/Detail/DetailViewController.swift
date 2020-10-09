@@ -159,10 +159,10 @@ class DetailViewController: UIViewController {
         stack.spacing = 5
         stack.alignment = .center
 
-        let numberLabel = makeLabel(with: "Number: " + viewModel.number)
-        let baseExperienceLabel = makeLabel(with: "Base Experience: " + viewModel.baseExperience)
-        let heightLabel = makeLabel(with: "Height: " + viewModel.height)
-        let weightLabel = makeLabel(with: "Weight: " + viewModel.weight)
+        let numberLabel = makeLabel(with: viewModel.number)
+        let baseExperienceLabel = makeLabel(with: viewModel.baseExperience)
+        let heightLabel = makeLabel(with: viewModel.height)
+        let weightLabel = makeLabel(with: viewModel.weight)
 
         stack.addArrangedSubview(numberLabel)
         stack.addArrangedSubview(baseExperienceLabel)
