@@ -14,6 +14,21 @@ enum DetailViewModelTestsError: Error {
 
 class DetailViewModelTests: XCTestCase {
 
+    func testPreparesStringToBeDisplayed() {
+        let title = "titleFoo"
+        let sut = makeSUT(number: "4",
+                title: title,
+                baseExperience: "20",
+                height: "75",
+                weight: "80")
+
+        XCTAssertEqual(sut.title, title)
+        XCTAssertEqual(sut.number, "Number: 4")
+        XCTAssertEqual(sut.baseExperience, "Base Experience: 20")
+        XCTAssertEqual(sut.height, "Height: 75")
+        XCTAssertEqual(sut.weight, "Weight: 80")
+    }
+
     func testOnInitDataSourceIsEmpty() {
         let sut = makeSUT(frontDefaultData: Data())
 
@@ -103,24 +118,18 @@ class DetailViewModelTests: XCTestCase {
         return makeSUT(sprites: sprites)
     }
 
-    private func makeSUT(loader: SpritesLoader = DummySpritesLoader()) -> DetailViewModel {
-        let sprites = SpritesFixture().makeSprites()
-        return DetailViewModel(number: "",
-                title: "",
-                baseExperience: "",
-                height: "",
-                weight: "",
-                sprites: sprites,
-                loader: loader)
-    }
-
-    private func makeSUT(sprites: Sprites,
+    private func makeSUT(number: String = "",
+                         title: String = "",
+                         baseExperience: String = "",
+                         height: String = "",
+                         weight: String = "",
+                         sprites: Sprites = SpritesFixture().makeSprites(),
                          loader: SpritesLoader = DummySpritesLoader()) -> DetailViewModel {
-        return DetailViewModel(number: "",
-                title: "",
-                baseExperience: "",
-                height: "",
-                weight: "",
+        DetailViewModel(number: number,
+                title: title,
+                baseExperience: baseExperience,
+                height: height,
+                weight: weight,
                 sprites: sprites,
                 loader: loader)
     }

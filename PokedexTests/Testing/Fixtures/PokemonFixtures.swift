@@ -54,7 +54,7 @@ class ImageFixture {
 }
 
 class DetailsFixture {
-    func make() -> Details {
-        Details(baseExperience: 0, height: 0, weight: 0)
+    func make(baseExperience: Int = 0, height: Int = 0, weight: Int = 0) -> Details {
+        Details(baseExperience: baseExperience, height: height, weight: weight)
     }
 }

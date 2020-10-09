@@ -8,11 +8,31 @@
 import UIKit
 
 class DetailViewModel {
-    let number: String
+    private let _number: String
+    var number: String {
+        get {
+            "Number: \(_number)"
+        }
+    }
     let title: String
-    let baseExperience: String
-    let height: String
-    let weight: String
+    private let _baseExperience: String
+    var baseExperience: String {
+        get {
+            "Base Experience: \(_baseExperience)"
+        }
+    }
+    private let _height: String
+    var height: String {
+        get {
+            "Height: \(_height)"
+        }
+    }
+    private let _weight: String
+    var weight: String {
+        get {
+            "Weight: \(_weight)"
+        }
+    }
     private let sprites: Sprites
 
     private let loader: SpritesLoader
@@ -26,11 +46,11 @@ class DetailViewModel {
          weight: String,
          sprites: Sprites,
          loader: SpritesLoader) {
-        self.number = number
+        self._number = number
         self.title = title
-        self.baseExperience = baseExperience
-        self.height = height
-        self.weight = weight
+        self._baseExperience = baseExperience
+        self._height = height
+        self._weight = weight
         self.sprites = sprites
         self.loader = loader
     }
