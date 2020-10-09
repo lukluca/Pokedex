@@ -59,7 +59,7 @@ class DetailViewController: UIViewController {
         let label = makeTitleLabel()
         addTitleLabel(label)
 
-        let scroll = DetailsScrollView()
+        let scroll = UIScrollView()
         let scrollContent = DetailsContentView()
         
         addScrollView(scroll, contentView: scrollContent, below: label)
@@ -213,26 +213,6 @@ extension DetailViewController: UICollectionViewDataSource {
 
 private extension CGFloat {
     static let margin: CGFloat = 30
-}
-
-private class DetailsScrollView: UIScrollView {
-    
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let collection = subviews.first { $0 is UICollectionView }
-        
-        guard let collectionView = collection else {
-            return super.point(inside: point, with: event)
-        }
-        
-        let converted = self.convert(point, to: collectionView)
-        let touchedCollection = collectionView.hitTest(converted, with: event) != nil
-        
-        if touchedCollection {
-            return true
-        }
-
-        return super.point(inside: point, with: event)
-    }
 }
 
 private class DetailsContentView: UIView {
